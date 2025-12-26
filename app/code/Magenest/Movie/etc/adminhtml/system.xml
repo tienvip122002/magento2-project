@@ -31,6 +31,7 @@
                        type="select" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Yes/No_Field_abcd</label>
+                    <frontend_model>Magenest\Movie\Model\Config\Frontend\RedField</frontend_model>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[<span style="color:#d00;font-weight:600;">Notice the color</span>]]></comment>
                 </field>
@@ -50,6 +51,7 @@
                     <label>Rows in table "magenest_movie"</label>
                     <frontend_model>Magenest\Movie\Block\Adminhtml\System\Config\Form\Field\RowCount</frontend_model>
                     <comment><![CDATA[read-only]]></comment>
+                    <comment><![CDATA[<!--table:magenest_movie-->read-only]]></comment>
                 </field>
 
                 <!-- 5) Rows in table "magenest_actor" (depends custom select = show(1)) -->
@@ -64,6 +66,8 @@
                     </depends>
 
                     <comment><![CDATA[read-only, only visible when Custom Select Field = show]]></comment>
+                    <comment><![CDATA[<!--table:magenest_actor-->read-only, only visible when ...]]></comment>
+
                 </field>
 
 
