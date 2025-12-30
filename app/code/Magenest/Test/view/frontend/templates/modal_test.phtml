@@ -1,0 +1,33 @@
+<h1>Modal Test Page</h1>
+<button id="openModal">Open Modal</button>
+<button id="openMagentoLoginModal">Open Magento Login Modal</button>
+<button id="openCustomLoginModal">Open Custom Login Modal</button>
+<script type="text/javascript">
+    require(['jquery', 'Magento_Ui/js/modal/modal'], function($, modal){
+    var options = {
+        type: 'popup',
+        modalClass: 'modal-login',
+        buttons: [{
+            text: 'Login',
+            class: 'action primary',
+            click: function() {
+                alert('Login clicked');
+            }
+        }]
+    };
+
+    var loginModal = modal(options, $('#loginModal'));
+    $('#openCustomLoginModal').click(function(){
+        loginModal.openModal();
+    });
+});
+
+</script>
+<div id="loginModal" style="display:none;">
+    <form>
+        <label for="email">Email</label>
+        <input type="text" id="email" name="email">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password">
+    </form>
+</div>
