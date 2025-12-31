@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <!-- Add avatar block BEFORE the dashboard info -->
+            <block class="Magenest\CustomerAvatar\Block\Account\Dashboard\Avatar"
+                   name="customer_avatar_dashboard"
+                   template="Magenest_CustomerAvatar::account/dashboard/avatar.phtml"
+                   before="customer_account_dashboard_info"/>
+        </referenceContainer>
+    </body>
+</page>

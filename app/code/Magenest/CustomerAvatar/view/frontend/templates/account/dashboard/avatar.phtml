@@ -1,0 +1,89 @@
+<?php
+/**
+ * @var $block \Magenest\CustomerAvatar\Block\Account\Dashboard\Avatar
+ */
+?>
+
+<div class="block block-dashboard-info">
+    <div class="block-title">
+        <strong><?= $block->escapeHtml(__('Customer Information')) ?></strong>
+    </div>
+    <div class="block-content">
+        <div class="customer-avatar-info">
+            <?php if ($block->hasAvatar()): ?>
+                <div class="customer-avatar">
+                    <img src="<?= $block->escapeUrl($block->getAvatarUrl()) ?>"
+                         alt="<?= $block->escapeHtmlAttr($block->getCustomerName()) ?>"
+                         class="customer-avatar-image" />
+                </div>
+            <?php else: ?>
+                <div class="customer-avatar customer-avatar-placeholder">
+                    <span class="avatar-initials">
+                        <?= $block->escapeHtml(substr($block->getCustomerName(), 0, 1)) ?>
+                    </span>
+                </div>
+            <?php endif; ?>
+
+            <div class="customer-info">
+                <p class="customer-name">
+                    <strong><?= $block->escapeHtml($block->getCustomerName()) ?></strong>
+                </p>
+                <p class="customer-email">
+                    <?= $block->escapeHtml($block->getCustomerEmail()) ?>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .customer-avatar-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 15px;
+    }
+
+    .customer-avatar {
+        flex-shrink: 0;
+    }
+
+    .customer-avatar-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+
+    .customer-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-initials {
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .customer-info {
+        flex-grow: 1;
+    }
+
+    .customer-name {
+        font-size: 18px;
+        margin: 0 0 5px 0;
+    }
+
+    .customer-email {
+        color: #666;
+        margin: 0;
+    }
+</style>
