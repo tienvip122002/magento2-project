@@ -1,0 +1,19 @@
+<button data-bind=" click: getProduct">Lấy sản phẩm tiếp theo</button>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Tên sản phẩm</th>
+        <th>Giá sản phẩm</th>
+        <th>Xem trước</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: productList">
+    <tr>
+        <td data-bind="text: entity_id"></td>
+        <td data-bind="text: name"></td>
+        <td data-bind="text: price"></td>
+        <td><img data-bind="attr: {src: src}" width="120" height="150" alt="Hình ảnh sản phẩm"></td>
+    </tr>
+    </tbody>
+</table>
