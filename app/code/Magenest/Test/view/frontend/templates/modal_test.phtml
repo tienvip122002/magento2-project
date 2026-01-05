@@ -1,33 +1,122 @@
-<h1>Modal Test Page</h1>
-<button id="openModal">Open Modal</button>
-<button id="openMagentoLoginModal">Open Magento Login Modal</button>
-<button id="openCustomLoginModal">Open Custom Login Modal</button>
-<script type="text/javascript">
-    require(['jquery', 'Magento_Ui/js/modal/modal'], function($, modal){
-    var options = {
-        type: 'popup',
-        modalClass: 'modal-login',
-        buttons: [{
-            text: 'Login',
-            class: 'action primary',
-            click: function() {
-                alert('Login clicked');
-            }
-        }]
-    };
+<div class="modal-test-page">
+    <h1>Modal Test Page</h1>
 
-    var loginModal = modal(options, $('#loginModal'));
-    $('#openCustomLoginModal').click(function(){
-        loginModal.openModal();
-    });
-});
+    <!-- Test 1: Simple alert with inline JavaScript -->
+    <button id="simple-alert-btn" class="action primary" onclick="alert('Simple alert works!')">
+        Test Simple Alert
+    </button>
 
-</script>
-<div id="loginModal" style="display:none;">
-    <form>
-        <label for="email">Email</label>
-        <input type="text" id="email" name="email">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password">
-    </form>
+    <!-- Test 3: Magento Alert Modal -->
+    <button id="magento-alert-btn" class="action primary">
+        Open Magento Alert Modal
+    </button>
+
+    <!-- Test 4: Custom Modal -->
+    <button id="custom-modal-btn" class="action primary">
+        Open Custom Modal
+    </button>
 </div>
+
+<!-- Custom Modal HTML -->
+<div id="custom-login-modal" style="display:none;">
+    <div style="background: white; padding: 30px; border-radius: 8px;">
+        <h2>Login Form</h2>
+        <form id="login-form">
+            <div style="margin-bottom: 15px;">
+                <label>Email:</label><br>
+                <input type="email" id="login-email" style="width: 100%; padding: 8px; margin-top: 5px;" required>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Password:</label><br>
+                <input type="password" id="login-password" style="width: 100%; padding: 8px; margin-top: 5px;" required>
+            </div>
+            <button type="submit" style="background: #7cc576; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                Login
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/alert',
+        'Magento_Ui/js/modal/modal'
+    ], function($, alert, modal) {
+        'use strict';
+
+
+
+        // Test 3: Magento Alert Modal
+        $('#magento-alert-btn').on('click', function() {
+            alert({
+                title: 'Hello World!',
+                content: 'This is Magento alert modal',
+                actions: {
+                    always: function() {
+                        console.log('Alert closed');
+                    }
+                }
+            });
+        });
+
+        // Test 4: Custom Modal
+        var options = {
+            type: 'popup',
+            responsive: true,
+            innerScroll: true,
+            title: 'Login',
+            modalClass: 'custom-login-modal',
+            buttons: []
+        };
+
+        var popup = modal(options, $('#custom-login-modal'));
+
+        $('#custom-modal-btn').on('click', function() {
+            $('#custom-login-modal').modal('openModal');
+        });
+
+        // Handle form submit
+        $('#login-form').on('submit', function(e) {
+            e.preventDefault();
+            var email = $('#login-email').val();
+            var password = $('#login-password').val();
+
+            console.log('Login:', {email: email, password: password});
+            alert({
+                title: 'Login Info',
+                content: 'Email: ' + email + '<br>Password: ' + password
+            });
+
+            $('#custom-login-modal').modal('closeModal');
+        });
+    });
+</script>
+
+<style>
+    .modal-test-page {
+        padding: 40px;
+        text-align: center;
+    }
+
+    .modal-test-page h1 {
+        margin-bottom: 30px;
+    }
+
+    .modal-test-page button {
+        margin: 10px;
+        padding: 12px 24px;
+        font-size: 16px;
+        display: inline-block;
+    }
+
+    /* Custom modal background */
+    .custom-login-modal {
+        background: rgba(124, 197, 118, 0.95) !important;
+    }
+
+    .custom-login-modal .modal-inner-wrap {
+        background: white;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+</style>
