@@ -1,0 +1,14 @@
+<div class="field customer_telephone required">
+    <label for="customer_telephone" class="label">
+        <span><?= $block->escapeHtml(__('Phone Number')) ?></span>
+    </label>
+    <div class="control">
+        <input type="text" 
+               name="customer_telephone" 
+               id="customer_telephone" 
+               title="<?= $block->escapeHtmlAttr(__('Phone Number')) ?>" 
+               class="input-text" 
+               data-validate="{required:false, 'validate-digits':true, 'max-length':10}"
+               autocomplete="tel">
+    </div>
+</div>

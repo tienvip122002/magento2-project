@@ -1,0 +1,12 @@
+<?php
+/** @var \Magenest\CustomerMangement\Block\B2bBanner $block */
+?>
+
+<?php if ($block->isB2bCustomer()): ?>
+    <div class="magenest-b2b-banner" style="margin-bottom: 20px; text-align: center;">
+        <img src="https://cms.piklab.vn/resources/Tai%20nguyen%20Piklab/File%20design%20TMDT/piklab3533.jpg" 
+             alt="Happy New Year B2B" 
+             style="max-width: 100%; border: 3px solid #ff0000; border-radius: 10px;" />
+        <h3 style="color: red; margin-top: 10px;">Chúc mừng năm mới - Dành riêng cho khách hàng B2B!</h3>
+    </div>
+<?php endif; ?>
