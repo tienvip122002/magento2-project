@@ -1,0 +1,31 @@
+<!--@subject Your Course Attachments - {{trans "Order #%order_id" order_id=$order.increment_id}} @-->
+<!--@vars {
+"var order.increment_id":"Order ID",
+"var customer_name":"Customer Name",
+"var attachments_html":"Attachments List HTML"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<p>{{trans "Hello %customer_name," customer_name=$customer_name}}</p>
+<p>{{trans "Thank you for your purchase!"}}</p>
+<p>{{trans "Here are the downloadable materials for the courses you purchased in Order #%order_id:"
+    order_id=$order.increment_id}}</p>
+
+<table class="message-content" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background-color: #f0f0f0;">
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{trans "Course"}}</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{trans "Attachment"}}</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{trans "Type"}}</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{trans "Link"}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{var attachments_html|raw}}
+    </tbody>
+</table>
+
+<p>{{trans "If you have any questions, please contact us."}}</p>
+
+{{template config_path="design/email/footer_template"}}

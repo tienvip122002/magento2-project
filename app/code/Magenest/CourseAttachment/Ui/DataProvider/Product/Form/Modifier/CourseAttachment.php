@@ -2,69 +2,44 @@
 namespace Magenest\CourseAttachment\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
-use Magento\Ui\Component\Form\Element\Input;
-use Magento\Ui\Component\Form\Element\Select;
-use Magento\Ui\Component\Form\Element\DataType\Text;
-use Magento\Ui\Component\Form\Field;
 use Magento\Framework\Stdlib\ArrayManager;
-use Magenest\CourseAttachment\Model\ResourceModel\Attachment\CollectionFactory;
 use Magento\Catalog\Model\Locator\LocatorInterface;
-use Magento\Eav\Api\AttributeSetRepositoryInterface; // <-- Thêm thư viện này
+use Magento\Eav\Api\AttributeSetRepositoryInterface;
+use Magento\Framework\View\LayoutInterface;
 
 class CourseAttachment extends AbstractModifier
 {
-    const DATA_SCOPE = 'magenest_course_attachments';
     const GROUP_NAME = 'magenest_course_attachment_group';
-    const TARGET_ATTRIBUTE_SET = 'Course'; // Tên Attribute Set muốn áp dụng
+    const TARGET_ATTRIBUTE_SET = 'Course';
 
     protected $arrayManager;
-    protected $collectionFactory;
     protected $locator;
-    protected $attributeSetRepository; // <-- Khai báo biến mới
+    protected $attributeSetRepository;
+    protected $layout;
 
     public function __construct(
         ArrayManager $arrayManager,
-        CollectionFactory $collectionFactory,
         LocatorInterface $locator,
-        AttributeSetRepositoryInterface $attributeSetRepository // <-- Inject vào đây
+        AttributeSetRepositoryInterface $attributeSetRepository,
+        LayoutInterface $layout
     ) {
         $this->arrayManager = $arrayManager;
-        $this->collectionFactory = $collectionFactory;
         $this->locator = $locator;
         $this->attributeSetRepository = $attributeSetRepository;
+        $this->layout = $layout;
     }
 
     public function modifyData(array $data)
     {
-        // 1. Kiểm tra Attribute Set trước khi load dữ liệu
-        if (!$this->isCourseAttributeSet()) {
-            return $data;
-        }
-
-        $product = $this->locator->getProduct();
-        $productId = $product->getId();
-
-        if ($productId) {
-            $collection = $this->collectionFactory->create()
-                ->addFieldToFilter('product_id', $productId)
-                ->setOrder('sort_order', 'ASC');
-
-            $items = [];
-            foreach ($collection as $item) {
-                $items[] = $item->getData();
-            }
-
-            $data[$productId]['product'][static::DATA_SCOPE] = $items;
-        }
-
+        // Don't inject data here, the Block handles it.
         return $data;
     }
 
     public function modifyMeta(array $meta)
     {
-        // 2. Kiểm tra Attribute Set trước khi vẽ UI
+        // 1. Check Attribute Set
         if (!$this->isCourseAttributeSet()) {
-            return $meta; // Nếu không phải 'Course' thì trả về nguyên trạng, không thêm bảng
+            return $meta;
         }
 
         $meta = $this->arrayManager->set(
@@ -76,14 +51,26 @@ class CourseAttachment extends AbstractModifier
                         'config' => [
                             'label' => __('Course Attachments'),
                             'componentType' => 'fieldset',
-                            'dataScope' => 'data.product',
                             'collapsible' => true,
+                            'opened' => true,
                             'sortOrder' => 20,
                         ],
                     ],
                 ],
                 'children' => [
-                    static::DATA_SCOPE => $this->getDynamicRowsConfig()
+                    'course_attachments_content' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'autoRender' => true,
+                                    'componentType' => 'container',
+                                    'component' => 'Magento_Ui/js/form/components/html',
+                                    'additionalClasses' => 'admin__fieldset-note',
+                                    'content' => $this->getBlockHtml(), // Render Block Content
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ]
         );
@@ -92,7 +79,18 @@ class CourseAttachment extends AbstractModifier
     }
 
     /**
-     * Hàm helper: Check xem sản phẩm hiện tại có phải thuộc Set 'Course' không
+     * Render the block content
+     */
+    protected function getBlockHtml()
+    {
+        $block = $this->layout->createBlock(
+            \Magenest\CourseAttachment\Block\Adminhtml\Product\Edit\Tab\Attachments::class
+        );
+        return $block->toHtml();
+    }
+
+    /**
+     * Helper: Check if current product is in 'Course' Attribute Set
      */
     protected function isCourseAttributeSet()
     {
@@ -104,139 +102,11 @@ class CourseAttachment extends AbstractModifier
                 return false;
             }
 
-            // Lấy thông tin Attribute Set từ ID
             $attributeSet = $this->attributeSetRepository->get($setId);
-
-            // So sánh tên (Hoặc bạn có thể so sánh ID nếu muốn cứng nhắc hơn)
             return $attributeSet->getAttributeSetName() === self::TARGET_ATTRIBUTE_SET;
 
         } catch (\Exception $e) {
             return false;
         }
-    }
-
-    protected function getDynamicRowsConfig()
-    {
-        // (Giữ nguyên hàm này như phiên bản đã sửa 'dataScope' => static::DATA_SCOPE)
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'componentType' => 'dynamicRows',
-                        'label' => __('Attachments'),
-                        'renderDefaultRecord' => false,
-                        'recordTemplate' => 'record',
-                        'dataScope' => static::DATA_SCOPE, // Đã sửa đúng ở bước trước
-                        'dndConfig' => ['enabled' => true],
-                        'addButton' => true,
-                        'itemTemplate' => 'record',
-                    ],
-                ],
-            ],
-            'children' => [
-                'record' => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'componentType' => 'container',
-                                'isTemplate' => true,
-                                'is_collection' => true,
-                                'component' => 'Magento_Ui/js/dynamic-rows/record',
-                                'dataScope' => '',
-                            ],
-                        ],
-                    ],
-                    'children' => [
-                        'entity_id' => [
-                            'arguments' => [
-                                'data' => [
-                                    'config' => [
-                                        'formElement' => Input::NAME,
-                                        'componentType' => Field::NAME,
-                                        'dataType' => Text::NAME,
-                                        'label' => '',
-                                        'dataScope' => 'entity_id',
-                                        'visible' => false,
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'label' => [
-                            'arguments' => [
-                                'data' => [
-                                    'config' => [
-                                        'formElement' => Input::NAME,
-                                        'componentType' => Field::NAME,
-                                        'dataType' => Text::NAME,
-                                        'label' => __('Label'),
-                                        'dataScope' => 'label',
-                                        'sortOrder' => 10,
-                                        'validation' => ['required-entry' => true],
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'file_type' => [
-                            'arguments' => [
-                                'data' => [
-                                    'config' => [
-                                        'formElement' => Select::NAME,
-                                        'componentType' => Field::NAME,
-                                        'dataType' => Text::NAME,
-                                        'label' => __('Type'),
-                                        'dataScope' => 'file_type',
-                                        'options' => [
-                                            ['value' => 'file', 'label' => __('File Upload')],
-                                            ['value' => 'link', 'label' => __('External Link')],
-                                        ],
-                                        'sortOrder' => 20,
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'file_path' => [
-                            'arguments' => [
-                                'data' => [
-                                    'config' => [
-                                        'formElement' => Input::NAME,
-                                        'componentType' => Field::NAME,
-                                        'dataType' => Text::NAME,
-                                        'label' => __('URL / File Path'),
-                                        'dataScope' => 'file_path',
-                                        'sortOrder' => 30,
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'sort_order' => [
-                            'arguments' => [
-                                'data' => [
-                                    'config' => [
-                                        'formElement' => Input::NAME,
-                                        'componentType' => Field::NAME,
-                                        'dataType' => 'number',
-                                        'label' => __('Order'),
-                                        'dataScope' => 'sort_order',
-                                        'sortOrder' => 40,
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'actionDelete' => [
-                            'arguments' => [
-                                'data' => [
-                                    'config' => [
-                                        'componentType' => 'actionDelete',
-                                        'dataType' => Text::NAME,
-                                        'label' => '',
-                                        'sortOrder' => 50,
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 }

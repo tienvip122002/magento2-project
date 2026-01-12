@@ -1,0 +1,145 @@
+<?php
+/** @var \Magenest\CourseAttachment\Block\Adminhtml\Product\Edit\Tab\Attachments $block */
+$attachments = $block->getAttachments();
+?>
+<div class="fieldset-wrapper" id="magenest-course-attachments">
+
+    <!-- [THÊM] Hidden flag để báo Observer biết form attachments đã submit -->
+    <input type="hidden" form="product_form"
+           name="product[course_attachments_list_submitted]"
+           value="1" />
+
+    <div class="fieldset-wrapper-title">
+        <strong class="title">
+            <span>
+                <?= $block->escapeHtml(__('Course Attachments')) ?>
+            </span>
+        </strong>
+    </div>
+
+    <div class="fieldset-wrapper-content">
+        <table class="data-grid" id="course_attachments_table">
+            <thead>
+                <tr>
+                    <th class="data-grid-th"><?= $block->escapeHtml(__('Label')) ?></th>
+                    <th class="data-grid-th"><?= $block->escapeHtml(__('Type')) ?></th>
+                    <th class="data-grid-th"><?= $block->escapeHtml(__('URL / File Path')) ?></th>
+                    <th class="data-grid-th"><?= $block->escapeHtml(__('Sort Order')) ?></th>
+                    <th class="data-grid-th"><?= $block->escapeHtml(__('Action')) ?></th>
+                </tr>
+            </thead>
+
+            <tbody id="attachment_container">
+                <?php foreach ($attachments as $item): ?>
+                    <tr class="attachment-row">
+                        <td>
+                            <input type="hidden" form="product_form"
+                                name="product[course_attachments_list][<?= $item->getId() ?>][entity_id]"
+                                value="<?= $item->getId() ?>" />
+                            <input type="hidden" form="product_form"
+                                name="product[course_attachments_list][<?= $item->getId() ?>][record_id]"
+                                value="<?= $item->getId() ?>" />
+
+                            <input type="text" form="product_form" class="input-text admin__control-text required-entry"
+                                name="product[course_attachments_list][<?= $item->getId() ?>][label]"
+                                value="<?= $block->escapeHtmlAttr($item->getLabel()) ?>" />
+                        </td>
+
+                        <td>
+                            <select class="select admin__control-select" form="product_form"
+                                name="product[course_attachments_list][<?= $item->getId() ?>][file_type]">
+                                <option value="file" <?= $item->getFileType() == 'file' ? 'selected' : '' ?>>
+                                    <?= __('File Upload') ?>
+                                </option>
+                                <option value="link" <?= $item->getFileType() == 'link' ? 'selected' : '' ?>>
+                                    <?= __('External Link') ?>
+                                </option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="text" form="product_form" class="input-text admin__control-text"
+                                name="product[course_attachments_list][<?= $item->getId() ?>][file_path]"
+                                value="<?= $block->escapeHtmlAttr($item->getFilePath()) ?>" />
+                        </td>
+
+                        <td>
+                            <input type="text" form="product_form" class="input-text admin__control-text"
+                                name="product[course_attachments_list][<?= $item->getId() ?>][sort_order]"
+                                value="<?= $block->escapeHtmlAttr($item->getSortOrder()) ?>" />
+                        </td>
+
+                        <td>
+                            <button type="button" class="action-delete" onclick="removeAttachmentRow(this)">
+                                <span><?= __('Delete') ?></span>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="col-actions-add">
+                        <button type="button" class="action-add" onclick="addAttachmentRow()">
+                            <span><?= __('Add New Attachment') ?></span>
+                        </button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<script>
+    function removeAttachmentRow(button) {
+        var row = button.closest('tr');
+        row.remove();
+    }
+
+    function addAttachmentRow() {
+        var timestamp = new Date().getTime();
+        var container = document.getElementById('attachment_container');
+        var newRow = document.createElement('tr');
+        newRow.className = 'attachment-row';
+        newRow.innerHTML = `
+            <td>
+                <input type="hidden" form="product_form" name="product[course_attachments_list][new_${timestamp}][record_id]" value="new_${timestamp}"/>
+                <input type="text" form="product_form" class="input-text admin__control-text required-entry" name="product[course_attachments_list][new_${timestamp}][label]" value="" />
+            </td>
+            <td>
+                <select class="select admin__control-select" form="product_form" name="product[course_attachments_list][new_${timestamp}][file_type]">
+                    <option value="file"><?= __('File Upload') ?></option>
+                    <option value="link"><?= __('External Link') ?></option>
+                </select>
+            </td>
+            <td>
+                <input type="text" form="product_form" class="input-text admin__control-text" name="product[course_attachments_list][new_${timestamp}][file_path]" value="" />
+            </td>
+             <td>
+                <input type="text" form="product_form" class="input-text admin__control-text" name="product[course_attachments_list][new_${timestamp}][sort_order]" value="0" />
+            </td>
+            <td>
+                <button type="button" class="action-delete" onclick="removeAttachmentRow(this)">
+                    <span><?= __('Delete') ?></span>
+                </button>
+            </td>
+        `;
+        container.appendChild(newRow);
+    }
+</script>
+
+<style>
+    .data-grid-th {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        text-align: left;
+    }
+    .attachment-row td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .action-add {
+        margin-top: 10px;
+    }
+</style>
