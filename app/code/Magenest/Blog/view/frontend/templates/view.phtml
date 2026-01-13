@@ -1,0 +1,26 @@
+<?php
+/** @var \Magenest\Blog\Block\View $block */
+$blog = $block->getCurrentBlog();
+?>
+
+<?php if ($blog): ?>
+    <div class="blog-post-view">
+        <h1 class="blog-title"><?= $block->escapeHtml($blog->getTitle()) ?></h1>
+        
+        <div class="blog-meta" style="color: #666; font-size: 14px; margin-bottom: 20px;">
+            <span class="author">
+                Author: <strong><?= $block->escapeHtml($block->getAuthorName()) ?></strong>
+            </span>
+            <span class="separator">|</span>
+            <span class="date">
+                <?= $block->formatDate($blog->getCreatedAt(), \IntlDateFormatter::MEDIUM, true) ?>
+            </span>
+        </div>
+
+        <div class="blog-content">
+            <?= /* @noEscape */ $blog->getContent() ?>
+        </div>
+    </div>
+<?php else: ?>
+    <div class="message error">Blog not found.</div>
+<?php endif; ?>

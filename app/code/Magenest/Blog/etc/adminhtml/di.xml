@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <virtualType name="MagenestBlogDataProvider" type="Magenest\Blog\Model\Blog\DataProvider">
+        <arguments>
+            <argument name="name" xsi:type="string">magenest_blog_form.magenest_blog_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MagenestBlogGridDataProvider" type="Magenest\Blog\Model\Blog\GridDataProvider">
+        <arguments>
+            <argument name="name" xsi:type="string">magenest_blog_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="magenest_blog_form_data_source" xsi:type="string">Magenest\Blog\Model\ResourceModel\Blog\Collection</item>
+                <item name="magenest_blog_listing_data_source" xsi:type="string">Magenest\Blog\Model\ResourceModel\Blog\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>
