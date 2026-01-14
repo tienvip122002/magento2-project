@@ -1,0 +1,24 @@
+<div class="magenest-delivery-options">
+    <strong>Select Delivery Time:</strong>
+
+    <div class="field choice">
+        <input type="radio" name="delivery_type" id="delivery_same_day" value="same_day"
+            data-bind="checked: selectedOption">
+        <label for="delivery_same_day" class="label">
+            <span>Same Day Delivery</span>
+        </label>
+    </div>
+
+    <div class="field choice">
+        <input type="radio" name="delivery_type" id="delivery_custom" value="custom_date"
+            data-bind="checked: selectedOption">
+        <label for="delivery_custom" class="label">
+            <span>Choose Your Date</span>
+        </label>
+    </div>
+
+    <div class="control">
+        <input type="text" class="input-text" placeholder="Select a date..."
+            data-bind="value: customDate, afterRender: initDatepicker" readonly="true" />
+    </div>
+</div>

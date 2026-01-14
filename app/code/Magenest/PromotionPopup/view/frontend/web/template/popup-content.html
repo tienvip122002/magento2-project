@@ -1,0 +1,13 @@
+<!-- ko if: isVisible -->
+<div class="magenest-popup-overlay" data-bind="visible: isVisible">
+    <div class="magenest-popup-container">
+        <div class="popup-header">
+            <h2>Special Offer!</h2>
+            <button data-bind="click: closePopup">X</button>
+        </div>
+        <div class="popup-body">
+            <div data-bind="html: getContent()"></div>
+        </div>
+    </div>
+</div>
+<!-- /ko -->

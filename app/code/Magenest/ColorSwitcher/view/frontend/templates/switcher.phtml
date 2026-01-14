@@ -1,0 +1,91 @@
+<?php
+/** @var \Magenest\ColorSwitcher\ViewModel\ColorData $viewModel */
+$viewModel = $block->getViewModel();
+$colorOptions = $viewModel->getColorOptions();
+?>
+
+<script>
+    console.log('DEBUG: ColorSwitcher colors =', <?= json_encode($colorOptions) ?>);
+    require(['jquery'], function ($) {
+        $(document).ready(function () {
+            console.log('DEBUG: Wrapper element exists:', $('#magenest-color-switcher').length > 0);
+            setTimeout(function () {
+                console.log('DEBUG: Wrapper HTML:', $('#magenest-color-switcher').html());
+            }, 2000);
+        });
+    });
+</script>
+
+<div id="magenest-color-switcher" data-bind="scope: 'colorSwitcher'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+
+<style>
+    /* Color Switcher Styles - Inline CSS for immediate loading */
+    #magenest-color-switcher {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100%;
+        background: #f0f0f0;
+        border-bottom: 2px solid #ccc;
+        padding: 10px 20px;
+        margin-bottom: 10px;
+    }
+
+    .color-switcher-wrapper {
+        display: flex !important;
+        visibility: visible !important;
+        align-items: center;
+        justify-content: flex-end;
+        max-width: 1280px;
+        margin: 0 auto;
+        gap: 15px;
+    }
+
+    .color-switcher-wrapper label {
+        margin: 0;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .color-switcher-wrapper select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        min-width: 150px;
+        cursor: pointer;
+        background: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .color-switcher-wrapper select:hover {
+        border-color: #1979c3;
+    }
+
+    .color-switcher-wrapper select:focus {
+        outline: none;
+        border-color: #1979c3;
+        box-shadow: 0 0 0 2px rgba(25, 121, 195, 0.1);
+    }
+</style>
+
+<script type="text/x-magento-init">
+{
+    "#magenest-color-switcher": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "colorSwitcher": {
+                    "component": "Magenest_ColorSwitcher/js/switcher",
+                    "config": {
+                        "options": <?= json_encode($colorOptions) ?>
+                    }
+                }
+            }
+        }
+    }
+}
+</script>

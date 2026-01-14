@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template" name="magenest.promotion.popup" template="Magenest_PromotionPopup::popup.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Magenest\PromotionPopup\ViewModel\PopupData</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

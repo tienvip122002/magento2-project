@@ -6,6 +6,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\App\RequestInterface;
 use Magenest\CourseAttachment\Model\AttachmentFactory;
 use Magenest\CourseAttachment\Model\ResourceModel\Attachment\CollectionFactory;
+use Psr\Log\LoggerInterface;
 
 class SaveAttachments implements ObserverInterface
 {
@@ -23,30 +24,33 @@ class SaveAttachments implements ObserverInterface
     protected $request;
     protected $attachmentFactory;
     protected $collectionFactory;
+    protected $logger;
 
     public function __construct(
         RequestInterface $request,
         AttachmentFactory $attachmentFactory,
-        CollectionFactory $collectionFactory
+        CollectionFactory $collectionFactory,
+        LoggerInterface $logger
     ) {
         $this->request = $request;
         $this->attachmentFactory = $attachmentFactory;
         $this->collectionFactory = $collectionFactory;
+        $this->logger = $logger;
     }
 
     public function execute(Observer $observer)
     {
         // 1. Lấy Product ID vừa lưu
         $product = $observer->getEvent()->getProduct();
-        $productId = (int)$product->getId();
+        $productId = (int) $product->getId();
 
         if ($productId <= 0) {
             return;
         }
 
         // 2. Lấy dữ liệu từ Form gửi lên
-        $formData = (array)$this->request->getPostValue();
-        $productData = (array)($formData['product'] ?? []);
+        $formData = (array) $this->request->getPostValue();
+        $productData = (array) ($formData['product'] ?? []);
 
 
         /**
@@ -55,7 +59,7 @@ class SaveAttachments implements ObserverInterface
          */
         $submitted = !empty($productData[self::SUBMIT_FLAG]);
         if (!$submitted) {
-            $logger->info('Magenest_CourseAttachment: Submit flag NOT found, skip processing.');
+            $this->logger->info('Magenest_CourseAttachment: Submit flag NOT found, skip processing.');
             return;
         }
 
@@ -64,14 +68,14 @@ class SaveAttachments implements ObserverInterface
          * - Trước đây: nếu không có key DATA_SCOPE thì return luôn
          * - Bây giờ: nếu submit flag có mà incoming list rỗng => delete all
          */
-        $incomingData = (array)($productData[self::DATA_SCOPE] ?? []);
+        $incomingData = (array) ($productData[self::DATA_SCOPE] ?? []);
 
         /**
          * [THÊM] 2C) Nếu incoming list trống / sau lọc không còn row hợp lệ => xóa hết
          * Đây là “logic xóa trước” 
          */
         if (empty($incomingData) || $this->isIncomingEffectivelyEmpty($incomingData)) {
-            $logger->info('Magenest_CourseAttachment: Incoming list empty => delete ALL attachments by product_id', [
+            $this->logger->info('Magenest_CourseAttachment: Incoming list empty => delete ALL attachments by product_id', [
                 'product_id' => $productId
             ]);
 
@@ -109,13 +113,13 @@ class SaveAttachments implements ObserverInterface
         // BƯỚC 3B: Lưu/update
         foreach ($incomingData as $key => $row) {
             // Bỏ qua dòng template rỗng (nếu có)
-            if (isset($row['delete']) && (int)$row['delete'] === 1) {
+            if (isset($row['delete']) && (int) $row['delete'] === 1) {
                 continue;
             }
 
             // Skip nếu label rỗng
             if (empty($row['label'])) {
-                $logger->warning("Magenest_CourseAttachment: Row $key skipped - No Label");
+                $this->logger->warning("Magenest_CourseAttachment: Row $key skipped - No Label");
                 continue;
             }
 
@@ -132,14 +136,14 @@ class SaveAttachments implements ObserverInterface
             $model->setData('label', $row['label']);
             $model->setData('file_type', $row['file_type'] ?? 'file');
             $model->setData('file_path', $row['file_path'] ?? '');
-            $model->setData('sort_order', (int)($row['sort_order'] ?? 0));
+            $model->setData('sort_order', (int) ($row['sort_order'] ?? 0));
 
             // Lưu vào DB
             try {
                 $model->save();
-                $logger->info("Magenest_CourseAttachment: Saved Row $key - ID: " . $model->getId());
+                $this->logger->info("Magenest_CourseAttachment: Saved Row $key - ID: " . $model->getId());
             } catch (\Exception $e) {
-                $logger->error("Magenest_CourseAttachment: Save Error Row $key: " . $e->getMessage());
+                $this->logger->error("Magenest_CourseAttachment: Save Error Row $key: " . $e->getMessage());
             }
         }
     }
@@ -179,11 +183,11 @@ class SaveAttachments implements ObserverInterface
                 continue;
             }
 
-            if (!empty($row['delete']) && (int)$row['delete'] === 1) {
+            if (!empty($row['delete']) && (int) $row['delete'] === 1) {
                 continue;
             }
 
-            if (isset($row['label']) && trim((string)$row['label']) !== '') {
+            if (isset($row['label']) && trim((string) $row['label']) !== '') {
                 return false; // có ít nhất 1 row hợp lệ
             }
         }

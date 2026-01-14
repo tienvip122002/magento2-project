@@ -1,0 +1,63 @@
+<?php
+/** @var \Magenest\PromotionPopup\ViewModel\PopupData $viewModel */
+$viewModel = $block->getViewModel();
+?>
+
+<?php if ($viewModel->isEnabled()): ?>
+    <div id="magenest-promotion-popup" data-bind="scope: 'promotionPopup'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    </div>
+
+    <style>
+        /* Fallback CSS cho popup - đảm bảo hiện được ngay */
+        .magenest-popup-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            z-index: 9999 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .magenest-popup-container {
+            background: #fff !important;
+            padding: 30px !important;
+            width: 500px !important;
+            max-width: 90% !important;
+            border-radius: 8px !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+            position: relative !important;
+            text-align: center !important;
+        }
+
+        .popup-header button {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            background: none !important;
+            border: none !important;
+            font-size: 20px !important;
+            cursor: pointer !important;
+            font-weight: bold !important;
+        }
+    </style>
+
+    <script type="text/x-magento-init">
+            {
+                "#magenest-promotion-popup": {
+                    "Magento_Ui/js/core/app": {
+                        "components": {
+                            "promotionPopup": {
+                                "component": "Magenest_PromotionPopup/js/view/popup",
+                                "config": <?= json_encode($viewModel->getPopupConfig()) ?>
+                            }
+                        }
+                    }
+                }
+            }
+            </script>
+<?php endif; ?>

@@ -1,0 +1,172 @@
+<div id="magenest-delivery-time-wrapper" data-bind="scope: 'deliveryTimeComponent'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+
+
+<script type="text/x-magento-init">
+{
+    "#magenest-delivery-time-wrapper": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "deliveryTimeComponent": {
+                    "component": "Magenest_DeliveryTime/js/delivery-time"
+                }
+            }
+        }
+    }
+}
+</script>
+<style>
+    /* Magenest Delivery Time Styles - Inline CSS for immediate loading */
+
+    /* Container Wrapper */
+    #magenest-delivery-time-wrapper {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        margin: 20px 0;
+        width: 100%;
+        z-index: 10;
+    }
+
+    /* Delivery Options Container */
+    .magenest-delivery-options {
+        display: block !important;
+        visibility: visible !important;
+        margin-bottom: 20px;
+        border: 2px solid #e3e3e3;
+        border-radius: 8px;
+        padding: 20px;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Title */
+    .magenest-delivery-options strong {
+        display: block;
+        margin-bottom: 15px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Radio Fields */
+    .magenest-delivery-options .field.choice {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        padding: 10px;
+        border-radius: 6px;
+        transition: background-color 0.2s ease;
+    }
+
+    .magenest-delivery-options .field.choice:hover {
+        background-color: #f9f9f9;
+    }
+
+    /* Radio Input */
+    .magenest-delivery-options input[type="radio"] {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 18px;
+        height: 18px;
+        margin: 0 10px 0 0;
+        cursor: pointer;
+        position: relative;
+    }
+
+    /* Radio Label */
+    .magenest-delivery-options .field.choice label {
+        display: inline-block !important;
+        visibility: visible !important;
+        margin: 0;
+        cursor: pointer;
+        font-size: 14px;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .magenest-delivery-options .field.choice label span {
+        display: inline-block;
+    }
+
+    /* Date Input Field */
+    .magenest-delivery-options .control {
+        display: block !important;
+        visibility: visible !important;
+        margin-top: 15px;
+    }
+
+    .magenest-delivery-options .control input[type="text"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100%;
+        max-width: 400px;
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        background: #fff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .magenest-delivery-options .control input[type="text"]:focus {
+        outline: none;
+        border-color: #1979c3;
+        box-shadow: 0 0 0 3px rgba(25, 121, 195, 0.1);
+    }
+
+    .magenest-delivery-options .control input[type="text"]::placeholder {
+        color: #999;
+        font-style: italic;
+    }
+
+    /* Datepicker Icon Support */
+    .magenest-delivery-options .control {
+        position: relative;
+    }
+
+    /* Hide original Magento field if it exists */
+    .field.date .control {
+        display: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .magenest-delivery-options {
+            padding: 15px;
+        }
+
+        .magenest-delivery-options .control input[type="text"] {
+            max-width: 100%;
+        }
+    }
+
+    /* UI-datepicker custom styling */
+    .ui-datepicker {
+        z-index: 9999 !important;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .ui-datepicker-header {
+        background: #1979c3;
+        color: #fff;
+        border-radius: 4px 4px 0 0;
+    }
+
+    .ui-datepicker-calendar td a {
+        text-align: center;
+        padding: 6px;
+    }
+
+    .ui-datepicker-calendar td a:hover {
+        background: #1979c3;
+        color: #fff;
+        border-radius: 4px;
+    }
+</style>
