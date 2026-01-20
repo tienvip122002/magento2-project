@@ -5,9 +5,7 @@ $attachments = $block->getAttachments();
 <div class="fieldset-wrapper" id="magenest-course-attachments">
 
     <!-- [THÊM] Hidden flag để báo Observer biết form attachments đã submit -->
-    <input type="hidden" form="product_form"
-           name="product[course_attachments_list_submitted]"
-           value="1" />
+    <input type="hidden" form="product_form" name="product[course_attachments_list_submitted]" value="1" />
 
     <div class="fieldset-wrapper-title">
         <strong class="title">
@@ -47,7 +45,8 @@ $attachments = $block->getAttachments();
 
                         <td>
                             <select class="select admin__control-select" form="product_form"
-                                name="product[course_attachments_list][<?= $item->getId() ?>][file_type]">
+                                name="product[course_attachments_list][<?= $item->getId() ?>][file_type]"
+                                onchange="toggleAttachmentType(this)">
                                 <option value="file" <?= $item->getFileType() == 'file' ? 'selected' : '' ?>>
                                     <?= __('File Upload') ?>
                                 </option>
@@ -58,9 +57,27 @@ $attachments = $block->getAttachments();
                         </td>
 
                         <td>
-                            <input type="text" form="product_form" class="input-text admin__control-text"
-                                name="product[course_attachments_list][<?= $item->getId() ?>][file_path]"
-                                value="<?= $block->escapeHtmlAttr($item->getFilePath()) ?>" />
+                            <!-- FILE INPUT -->
+                            <div class="input-box-file" style="<?= $item->getFileType() == 'file' ? '' : 'display:none' ?>">
+                                <input type="file" form="product_form" name="course_attachment_files[<?= $item->getId() ?>]" />
+                                
+                                <?php if ($item->getFileType() == 'file' && $item->getFilePath()): ?>
+                                    <div style="margin-top: 5px; font-size: 12px; color: green;">
+                                        <?= __('Current:') ?> <?= $block->escapeHtml($item->getFilePath()) ?>
+                                    </div>
+                                    <input type="hidden" form="product_form" 
+                                           name="product[course_attachments_list][<?= $item->getId() ?>][existing_file]" 
+                                           value="<?= $block->escapeHtmlAttr($item->getFilePath()) ?>" />
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- LINK INPUT -->
+                            <div class="input-box-link" style="<?= $item->getFileType() == 'link' ? '' : 'display:none' ?>">
+                                <input type="text" form="product_form" class="input-text admin__control-text"
+                                    placeholder="https://"
+                                    name="product[course_attachments_list][<?= $item->getId() ?>][file_path]"
+                                    value="<?= $item->getFileType() == 'link' ? $block->escapeHtmlAttr($item->getFilePath()) : '' ?>" />
+                            </div>
                         </td>
 
                         <td>
@@ -108,13 +125,23 @@ $attachments = $block->getAttachments();
                 <input type="text" form="product_form" class="input-text admin__control-text required-entry" name="product[course_attachments_list][new_${timestamp}][label]" value="" />
             </td>
             <td>
-                <select class="select admin__control-select" form="product_form" name="product[course_attachments_list][new_${timestamp}][file_type]">
+                <select class="select admin__control-select" form="product_form" 
+                        name="product[course_attachments_list][new_${timestamp}][file_type]"
+                        onchange="toggleAttachmentType(this)">
                     <option value="file"><?= __('File Upload') ?></option>
                     <option value="link"><?= __('External Link') ?></option>
                 </select>
             </td>
             <td>
-                <input type="text" form="product_form" class="input-text admin__control-text" name="product[course_attachments_list][new_${timestamp}][file_path]" value="" />
+                <!-- FILE INPUT -->
+                <div class="input-box-file">
+                    <input type="file" form="product_form" name="course_attachment_files[new_${timestamp}]" />
+                </div>
+                <!-- LINK INPUT -->
+                <div class="input-box-link" style="display:none;">
+                    <input type="text" form="product_form" class="input-text admin__control-text" placeholder="https://"
+                           name="product[course_attachments_list][new_${timestamp}][file_path]" value="" />
+                </div>
             </td>
              <td>
                 <input type="text" form="product_form" class="input-text admin__control-text" name="product[course_attachments_list][new_${timestamp}][sort_order]" value="0" />
@@ -127,6 +154,20 @@ $attachments = $block->getAttachments();
         `;
         container.appendChild(newRow);
     }
+
+    function toggleAttachmentType(selectElement) {
+        var row = selectElement.closest('tr');
+        var fileBox = row.querySelector('.input-box-file');
+        var linkBox = row.querySelector('.input-box-link');
+
+        if (selectElement.value === 'file') {
+            fileBox.style.display = 'block';
+            linkBox.style.display = 'none';
+        } else {
+            fileBox.style.display = 'none';
+            linkBox.style.display = 'block';
+        }
+    }
 </script>
 
 <style>
@@ -135,10 +176,12 @@ $attachments = $block->getAttachments();
         border-bottom: 1px solid #ccc;
         text-align: left;
     }
+
     .attachment-row td {
         padding: 10px;
         border-bottom: 1px solid #eee;
     }
+
     .action-add {
         margin-top: 10px;
     }

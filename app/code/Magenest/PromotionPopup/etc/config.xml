@@ -5,6 +5,7 @@
         <promotion_popup>
             <general>
                 <enable>1</enable>
+                <customer_group_content><![CDATA[a:1:{i:0;s:87:"<h2>Welcome Guest!</h2><p>Sign up today and get 10% off your first purchase!</p>";}]]></customer_group_content>
             </general>
         </promotion_popup>
     </default>

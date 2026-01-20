@@ -126,17 +126,28 @@ class SendCourseAttachments implements ObserverInterface
     protected function sendEmail($order, $attachmentsData)
     {
         $html = '';
+        $mediaUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
+
         foreach ($attachmentsData as $data) {
             $link = $data['path'];
-            // Basic check if it's a full URL or local path. Assuming Input was raw URL.
-            // If it was a file upload path, meaningful URL generation would be needed.
-            // For now, assuming direct link or raw path as entered.
+            $linkText = 'View Link';
+            $extraAttributes = 'target="_blank"';
+
+            if ($data['type'] == 'file') {
+                // If it's a relative path (from our upload), prepend media URL
+                if (strpos($link, 'http') !== 0) {
+                    $link = $mediaUrl . $link;
+                }
+                // Force download behavior
+                $linkText = 'Download File';
+                $extraAttributes = 'download';
+            }
 
             $html .= '<tr>';
             $html .= '<td style="padding: 10px; border: 1px solid #ddd;">' . $data['product_name'] . '</td>';
             $html .= '<td style="padding: 10px; border: 1px solid #ddd;">' . $data['label'] . '</td>';
             $html .= '<td style="padding: 10px; border: 1px solid #ddd;">' . ($data['type'] == 'file' ? 'File' : 'Link') . '</td>';
-            $html .= '<td style="padding: 10px; border: 1px solid #ddd;"><a href="' . $link . '" target="_blank">Download/View</a></td>';
+            $html .= '<td style="padding: 10px; border: 1px solid #ddd;"><a href="' . $link . '" ' . $extraAttributes . '>' . $linkText . '</a></td>';
             $html .= '</tr>';
         }
 

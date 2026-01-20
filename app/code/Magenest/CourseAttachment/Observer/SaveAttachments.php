@@ -6,7 +6,11 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\App\RequestInterface;
 use Magenest\CourseAttachment\Model\AttachmentFactory;
 use Magenest\CourseAttachment\Model\ResourceModel\Attachment\CollectionFactory;
+
 use Psr\Log\LoggerInterface;
+use Magento\MediaStorage\Model\File\UploaderFactory;
+use Magento\Framework\Filesystem;
+use Magento\Framework\App\Filesystem\DirectoryList;
 
 class SaveAttachments implements ObserverInterface
 {
@@ -25,17 +29,25 @@ class SaveAttachments implements ObserverInterface
     protected $attachmentFactory;
     protected $collectionFactory;
     protected $logger;
+    protected $uploaderFactory;
+    protected $filesystem;
+    protected $mediaDirectory;
 
     public function __construct(
         RequestInterface $request,
         AttachmentFactory $attachmentFactory,
         CollectionFactory $collectionFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        UploaderFactory $uploaderFactory,
+        Filesystem $filesystem
     ) {
         $this->request = $request;
         $this->attachmentFactory = $attachmentFactory;
         $this->collectionFactory = $collectionFactory;
         $this->logger = $logger;
+        $this->uploaderFactory = $uploaderFactory;
+        $this->filesystem = $filesystem;
+        $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
     }
 
     public function execute(Observer $observer)
@@ -134,8 +146,25 @@ class SaveAttachments implements ObserverInterface
             // Gán dữ liệu
             $model->setData('product_id', $productId);
             $model->setData('label', $row['label']);
-            $model->setData('file_type', $row['file_type'] ?? 'file');
-            $model->setData('file_path', $row['file_path'] ?? '');
+            $fileType = $row['file_type'] ?? 'file';
+            $filePath = $row['file_path'] ?? '';
+
+            // Handle File Upload if type is 'file'
+            if ($fileType === 'file') {
+                $uploadedFile = $this->uploadFile($key);
+                if ($uploadedFile) {
+                    $filePath = $uploadedFile;
+                } else {
+                    // Use existing file if no new upload
+                    $filePath = $row['existing_file'] ?? '';
+                }
+            }
+
+            // Gán dữ liệu
+            $model->setData('product_id', $productId);
+            $model->setData('label', $row['label']);
+            $model->setData('file_type', $fileType);
+            $model->setData('file_path', $filePath);
             $model->setData('sort_order', (int) ($row['sort_order'] ?? 0));
 
             // Lưu vào DB
@@ -149,7 +178,7 @@ class SaveAttachments implements ObserverInterface
     }
 
     /**
-     * Hàm phụ để xóa nhiều dòng cùng lúc (giữ nguyên của ông)
+     * Hàm phụ để xóa nhiều dòng cùng lúc 
      */
     private function deleteAttachments($ids)
     {
@@ -192,5 +221,43 @@ class SaveAttachments implements ObserverInterface
             }
         }
         return true;
+    }
+
+
+    /**
+     * Upload file for specific row key
+     */
+    private function uploadFile($rowId)
+    {
+        try {
+            // Check if file exists in $_FILES['course_attachment_files'][$rowId]
+            $files = $this->request->getFiles('course_attachment_files');
+            if (empty($files[$rowId]['name'])) {
+                return null;
+            }
+
+            // Prepare correct file array structure for Uploader factory
+            $fileData = $files[$rowId];
+
+            // if mapping is needed manually (sometimes Magento request object behaves differently)
+            // But usually getFiles returns array tree. 
+            // Standard Factory expects field name or file array. 
+            // We pass the file array directly.
+
+            $uploader = $this->uploaderFactory->create(['fileId' => $fileData]);
+            $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png', 'pdf', 'doc', 'docx', 'zip']);
+            $uploader->setAllowRenameFiles(true);
+            $uploader->setFilesDispersion(false);
+
+            $path = $this->mediaDirectory->getAbsolutePath('magenest/course_attachment');
+            $result = $uploader->save($path);
+
+            if ($result['file']) {
+                return 'magenest/course_attachment/' . $result['file'];
+            }
+        } catch (\Exception $e) {
+            $this->logger->error("File Upload Error for Row $rowId: " . $e->getMessage());
+        }
+        return null;
     }
 }

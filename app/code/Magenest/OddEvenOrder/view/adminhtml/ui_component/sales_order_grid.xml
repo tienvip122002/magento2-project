@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
-
+    
+    <!-- Add column to existing sales_order_grid -->
     <columns name="sales_order_columns">
         <column name="odd_even"
                 class="Magenest\OddEvenOrder\Ui\Component\Listing\Column\OddEven"
@@ -15,17 +16,5 @@
             </settings>
         </column>
     </columns>
-
-    <!-- <columns name="sales_order_columns"
-    class="Magenest\OddEvenOrder\Ui\Component\Listing\Column\OddEven">
-        <column name="odd_even" sortOrder="999">
-            <settings>
-                <label translate="true">Odd/Even</label>
-                <filter>false</filter>
-                <sorting>false</sorting>
-            </settings>
-        </column>
-    </columns> -->
-
 
 </listing>

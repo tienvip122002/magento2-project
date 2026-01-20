@@ -5,7 +5,6 @@
             <block class="Magenest\CustomerMangement\Block\B2bBanner" 
                    name="b2b.banner.product" 
                    template="Magenest_CustomerMangement::banner.phtml" 
-                   cacheable="false"
                    before="-"/>
         </referenceContainer>
     </body>

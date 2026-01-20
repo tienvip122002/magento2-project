@@ -30,6 +30,14 @@ class Data extends AbstractHelper
      */
     public function canAccessProduct($customerId, $productId, $customerGroupId)
     {
+        // // Ví dụ logic bổ sung:
+        // $product = $this->productRepository->getById($productId);
+        // $attributeSetId = $product->getAttributeSetId();
+
+        // // Giả sử ID của set Course là 4 (hoặc query db để lấy ID theo tên 'Course')
+        // if ($attributeSetId != $COURSE_SET_ID) {
+        //     return true; // Nếu không phải khóa học -> Không áp dụng giới hạn thời gian (hoặc false tùy logic)
+        // }
         // 1. Lấy số ngày cho phép từ Config
         $allowedDays = $this->getDurationFromConfig($customerGroupId);
         

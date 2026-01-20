@@ -10,4 +10,9 @@
         <plugin name="save_vn_region" type="Magenest\CustomerMangement\Plugin\ShippingInformationManagementPlugin"
                 sortOrder="10"/>
     </type>
+    
+    <type name="Magento\Quote\Model\Quote\Address">
+        <plugin name="magenest_transfer_vn_region_to_customer_address" 
+                type="Magenest\CustomerMangement\Plugin\Quote\Address\ExportCustomerAddressPlugin" />
+    </type>
 </config>

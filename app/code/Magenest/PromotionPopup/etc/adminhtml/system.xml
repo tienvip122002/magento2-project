@@ -15,11 +15,11 @@
                     <label>Enable Popup</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="content_guest" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Content for Guest (Not Logged In)</label>
-                </field>
-                <field id="content_member" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Content for Members (Logged In)</label>
+                <field id="customer_group_content" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Popup Content by Customer Group</label>
+                    <frontend_model>Magenest\PromotionPopup\Block\Adminhtml\System\Config\CustomerGroupContent</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>Configure popup content for each customer group</comment>
                 </field>
             </group>
         </section>

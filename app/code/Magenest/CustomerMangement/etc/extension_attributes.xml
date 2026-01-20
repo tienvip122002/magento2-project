@@ -4,4 +4,10 @@
     <extension_attributes for="Magento\Quote\Api\Data\AddressInterface">
         <attribute code="vn_region" type="string"/>
     </extension_attributes>
+    <extension_attributes for="Magento\Customer\Api\Data\AddressInterface">
+        <attribute code="vn_region" type="string"/>
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderAddressInterface">
+        <attribute code="vn_region" type="string"/>
+    </extension_attributes>
 </config>

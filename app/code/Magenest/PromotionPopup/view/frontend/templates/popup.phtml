@@ -47,17 +47,17 @@ $viewModel = $block->getViewModel();
     </style>
 
     <script type="text/x-magento-init">
-            {
-                "#magenest-promotion-popup": {
-                    "Magento_Ui/js/core/app": {
-                        "components": {
-                            "promotionPopup": {
-                                "component": "Magenest_PromotionPopup/js/view/popup",
-                                "config": <?= json_encode($viewModel->getPopupConfig()) ?>
+                        {
+                            "#magenest-promotion-popup": {
+                                "Magento_Ui/js/core/app": {
+                                    "components": {
+                                        "promotionPopup": {
+                                            "component": "Magenest_PromotionPopup/js/view/popup",
+                                            "customer_group_contents": <?= $viewModel->getPopupConfig() ?>
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            }
-            </script>
+                        </script>
 <?php endif; ?>

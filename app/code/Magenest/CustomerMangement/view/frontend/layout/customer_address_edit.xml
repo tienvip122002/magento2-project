@@ -10,7 +10,7 @@
     <body>
 
         <referenceBlock name="customer_address_edit"
-                        template="Magenest_CustomAddress::address/edit.phtml">
+                        template="Magenest_CustomerMangement::address/edit.phtml">
 
             <arguments>
                 <argument name="view_model_vnregion" xsi:type="object">
