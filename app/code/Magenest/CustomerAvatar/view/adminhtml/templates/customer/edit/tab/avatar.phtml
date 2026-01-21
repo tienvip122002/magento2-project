@@ -1,0 +1,31 @@
+<?php
+/**
+ * @var \Magenest\CustomerAvatar\Block\Adminhtml\Customer\Edit\Tab\Avatar $block
+ */
+?>
+<div class="customer-avatar-display" style="padding: 20px;">
+    <h3 style="margin-bottom: 15px; font-size: 1.6rem; font-weight: 600; color: #303030;">
+        <?= $block->escapeHtml(__('Customer Avatar')) ?>
+    </h3>
+
+    <?php if ($block->hasAvatar()): ?>
+        <div class="avatar-container" style="text-align: center;">
+            <img src="<?= $block->escapeUrl($block->getAvatarUrl()) ?>"
+                alt="<?= $block->escapeHtml($block->getCustomerName()) ?>"
+                style="max-width: 200px; max-height: 200px; border-radius: 50%; border: 3px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+            <p style="margin-top: 10px; color: #666; font-size: 1.2rem;">
+                <?= $block->escapeHtml($block->getCustomerName()) ?>
+            </p>
+        </div>
+    <?php else: ?>
+        <div class="no-avatar" style="text-align: center; padding: 40px; background: #f5f5f5; border-radius: 8px;">
+            <span class="admin__field-label" style="font-size: 1.4rem; color: #999;">
+                <span class="admin__field-fallback-icon"
+                    style="font-size: 60px; display: block; margin-bottom: 10px; color: #ccc;">
+                    &#128100;
+                </span>
+                <?= $block->escapeHtml(__('No avatar uploaded for this customer.')) ?>
+            </span>
+        </div>
+    <?php endif; ?>
+</div>

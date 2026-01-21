@@ -7,9 +7,8 @@ use Magento\Catalog\Model\Product;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magenest\AdminProductSection\Model\Attribute\Backend\DateRange;
 
-class UpdateDateAttributeBackend implements DataPatchInterface
+class UpdateDateAttributeGrid implements DataPatchInterface
 {
     public function __construct(
         private readonly ModuleDataSetupInterface $moduleDataSetup,
@@ -27,12 +26,6 @@ class UpdateDateAttributeBackend implements DataPatchInterface
 
         foreach ($attributes as $attributeCode) {
             if ($eavSetup->getAttributeId($entityType, $attributeCode)) {
-                $eavSetup->updateAttribute(
-                    $entityType,
-                    $attributeCode,
-                    'backend_model',
-                    DateRange::class
-                );
                 $eavSetup->updateAttribute($entityType, $attributeCode, 'is_used_in_grid', 1);
                 $eavSetup->updateAttribute($entityType, $attributeCode, 'is_visible_in_grid', 1);
                 $eavSetup->updateAttribute($entityType, $attributeCode, 'is_filterable_in_grid', 1);
@@ -45,7 +38,7 @@ class UpdateDateAttributeBackend implements DataPatchInterface
     public static function getDependencies(): array
     {
         return [
-            AddMagenestDateAttributes::class
+            UpdateDateAttributeBackend::class
         ];
     }
 

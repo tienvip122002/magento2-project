@@ -27,7 +27,10 @@ class ShippingInformationManagementPlugin
         $this->customerAddressRepository = $customerAddressRepository;
     }
 
-    // Magenest/CustomAddress/Plugin/ShippingInformationManagementPlugin.php
+    /**
+     * Plugin can thiệp TRƯỚC khi thông tin shipping được lưu vào Quote.
+     * Mục đích: Trích xuất vn_region từ payload (hoặc load từ DB) và gán vào Quote Address.
+     */
     public function beforeSaveAddressInformation(
         ShippingInformationManagement $subject,
         $cartId,
@@ -42,9 +45,9 @@ class ShippingInformationManagementPlugin
 
         $vnRegionValue = null;
 
-        // PRIORITY FIX:
-        // If Customer Address ID exists, prioritize loading from Repository/DB over Frontend Payload.
-        // This avoids issues where frontend might send a default "1" for an existing address that has "2".
+        // ƯU TIÊN 1: Load từ Address Book (Database)
+        // Nếu shipping address có ID (tức là user chọn từ sổ địa chỉ đã lưu)
+        // Ta nên lấy vn_region trực tiếp từ DB thay vì tin tưởng payload frontend gửi lên (có thể bị sai hoặc thiếu)
         if ($address->getCustomerAddressId()) {
             try {
                 $customerAddressId = $address->getCustomerAddressId();
@@ -68,11 +71,12 @@ class ShippingInformationManagementPlugin
             }
         }
 
-        // Only check payload if vnRegionValue is still NULL (meaning it's a NEW address or DB didn't have it)
+        // ƯU TIÊN 2: Lấy từ Payload (Địa chỉ mới hoặc DB không có)
+        // Chỉ chạy nếu bước 1 chưa tìm thấy vn_region
         if ($vnRegionValue === null) {
             $this->logger->info("VN_REGION_DEBUG: Checking payload for vn_region (New Address or not in DB)...");
 
-            // 1. Try Extension Attributes
+            // 1. Thử Extension Attributes
             if ($address->getExtensionAttributes()) {
                 $extAttrs = $address->getExtensionAttributes();
                 $val = $extAttrs->getVnRegion();
@@ -84,12 +88,12 @@ class ShippingInformationManagementPlugin
                 $this->logger->info('VN_REGION_DEBUG: No ExtensionAttributes on incoming address.');
             }
 
-            // 2. Try Custom Attributes
+            // 2. Thử Custom Attributes (Mảng key-value)
             if ($vnRegionValue === null) {
                 $customAttributes = $address->getCustomAttributes();
                 if (is_array($customAttributes)) {
                     foreach ($customAttributes as $attribute) {
-                        // Check if attribute is array or object
+                        // Kiểm tra nếu attribute là mảng hay object (do cơ chế deserialize của Magento có thể khác nhau)
                         $code = is_array($attribute) ? ($attribute['attribute_code'] ?? null) : $attribute->getAttributeCode();
                         $value = is_array($attribute) ? ($attribute['value'] ?? null) : $attribute->getValue();
 
@@ -103,6 +107,7 @@ class ShippingInformationManagementPlugin
             }
         }
 
+        // Set giá trị tìm được vào Shipping Address của Quote
         if ($vnRegionValue !== null) {
             $this->logger->info("VN_REGION_DEBUG: Setting vn_region to quote address: " . $vnRegionValue);
             $quote->getShippingAddress()->setData('vn_region', $vnRegionValue);
@@ -113,6 +118,10 @@ class ShippingInformationManagementPlugin
         return [$cartId, $addressInformation];
     }
 
+    /**
+     * Plugin can thiệp SAU khi thông tin shipping đã được lưu.
+     * Mục đích: Force save lại để đảm bảo dữ liệu custom attribute được persist xuống DB.
+     */
     public function afterSaveAddressInformation(
         ShippingInformationManagement $subject,
         $result,
@@ -121,6 +130,8 @@ class ShippingInformationManagementPlugin
     ) {
         $quote = $this->quoteRepository->getActive($cartId);
         $shippingAddress = $quote->getShippingAddress();
+
+        // Kiểm tra và lưu lại lần nữa để chắc chắn
         if ($vnRegion = $shippingAddress->getData('vn_region')) {
             $shippingAddress->setData('vn_region', $vnRegion);
             $shippingAddress->save();

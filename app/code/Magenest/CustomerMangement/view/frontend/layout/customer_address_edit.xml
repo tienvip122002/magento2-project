@@ -9,15 +9,15 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
 
-        <referenceBlock name="customer_address_edit"
-                        template="Magenest_CustomerMangement::address/edit.phtml">
-
+        <referenceBlock name="customer_address_edit">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Magenest_CustomerMangement::address/edit.phtml</argument>
+            </action>
             <arguments>
                 <argument name="view_model_vnregion" xsi:type="object">
                     Magenest\CustomerMangement\ViewModel\VNRegionViewModel
                 </argument>
             </arguments>
-
         </referenceBlock>
 
     </body>

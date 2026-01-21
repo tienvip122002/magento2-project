@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="product_columns">
+        <column name="magenest_from_date" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="label" xsi:type="string" translate="true">Magenest From Date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="dateFormat" xsi:type="string">MMM d, yyyy h:mm:ss a</item>
+                    <item name="options" xsi:type="array">
+                        <item name="showsTime" xsi:type="boolean">true</item>
+                        <item name="timeFormat" xsi:type="string">HH:mm</item>
+                    </item>
+                </item>
+            </argument>
+        </column>
+        <column name="magenest_to_date" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="label" xsi:type="string" translate="true">Magenest To Date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="dateFormat" xsi:type="string">MMM d, yyyy h:mm:ss a</item>
+                    <item name="options" xsi:type="array">
+                        <item name="showsTime" xsi:type="boolean">true</item>
+                        <item name="timeFormat" xsi:type="string">HH:mm</item>
+                    </item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+</listing>

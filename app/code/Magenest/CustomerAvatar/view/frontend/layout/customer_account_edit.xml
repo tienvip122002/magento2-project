@@ -4,9 +4,9 @@
     <body>
         <referenceContainer name="content">
             <block class="Magenest\CustomerAvatar\Block\Account\Dashboard\Avatar"
-                   name="customer_avatar_dashboard"
-                   template="Magenest_CustomerAvatar::account/dashboard/avatar.phtml"
-                   before="customer_account_dashboard_info"/>
+                   name="customer_avatar_edit"
+                   template="Magenest_CustomerAvatar::account/edit/avatar.phtml"
+                   before="customer_edit"/>
         </referenceContainer>
     </body>
 </page>

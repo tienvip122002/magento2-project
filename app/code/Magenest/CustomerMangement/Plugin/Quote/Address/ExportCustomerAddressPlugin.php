@@ -22,26 +22,32 @@ class ExportCustomerAddressPlugin
     }
 
     /**
-     * @param QuoteAddress $subject
-     * @param CustomerAddressInterface $result
+     * Plugin can thiệp SAU khi địa chỉ Quote được export thành địa chỉ Khách hàng.
+     * Chức năng: Đảm bảo custom attribute 'vn_region' được copy sang địa chỉ KH khi user chọn "Lưu vào sổ địa chỉ".
+     *
+     * @param QuoteAddress $subject Đối tượng địa chỉ trên Quote (Checkout)
+     * @param CustomerAddressInterface $result Đối tượng địa chỉ Khách hàng (Address Book) vừa được tạo ra
      * @return CustomerAddressInterface
      */
     public function afterExportCustomerAddress(QuoteAddress $subject, CustomerAddressInterface $result)
     {
         $this->logger->info('VN_REGION_DEBUG: ExportCustomerAddressPlugin called');
 
+        // 1. Lấy giá trị vn_region từ địa chỉ Quote (địa chỉ đang checkout)
         $vnRegion = $subject->getData('vn_region');
         $this->logger->info('VN_REGION_DEBUG: Quote Address vn_region value: ' . json_encode($vnRegion));
 
         if ($vnRegion) {
-            // Set as Custom Attribute for EAV persistence
+            // 2. Set giá trị vn_region vào Custom Attribute của Customer Address
+            // Điều này đảm bảo EAV (Entity-Attribute-Value) model sẽ lưu được xuống DB
             $result->setCustomAttribute('vn_region', $vnRegion);
             $this->logger->info('VN_REGION_DEBUG: Set custom attribute vn_region on CustomerAddress result.');
 
-            // Also set as extension attribute if available/needed
+            // 3. Ngoài ra, set luôn vào Extension Attributes nếu có
+            // Một số logic API hoặc module khác có thể sẽ đọc từ Extension Attributes thay vì Custom Attributes
             $extensionAttributes = $result->getExtensionAttributes();
             if ($extensionAttributes) {
-                // Check setter by method existence
+                // Kiểm tra xem interface Extension Attributes có hỗ trợ setter cho vn_region không
                 if (method_exists($extensionAttributes, 'setVnRegion')) {
                     $extensionAttributes->setVnRegion($vnRegion);
                     $this->logger->info('VN_REGION_DEBUG: Set extension attribute vn_region.');

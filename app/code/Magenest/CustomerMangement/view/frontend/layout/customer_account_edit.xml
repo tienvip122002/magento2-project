@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="customer_b2b_status"
+                   template="Magenest_CustomerMangement::customer/account/b2b_status.phtml"
+                   after="customer_avatar_edit"
+                   before="customer_edit">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Magenest\CustomerMangement\ViewModel\CustomerInfoViewModel</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

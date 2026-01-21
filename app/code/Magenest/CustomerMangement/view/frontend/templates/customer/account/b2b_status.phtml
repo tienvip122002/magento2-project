@@ -1,0 +1,19 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magenest\CustomerMangement\ViewModel\CustomerInfoViewModel $viewModel */
+$viewModel = $block->getData('view_model');
+?>
+<?php if ($viewModel): ?>
+    <fieldset class="fieldset info">
+        <div class="field">
+            <label class="label"><span>
+                    <?= $block->escapeHtml(__('Account Type')) ?>
+                </span></label>
+            <div class="control">
+                <span class="input-text-display" style="display: inline-block; padding-top: 7px; font-weight: bold;">
+                    <?= $block->escapeHtml($viewModel->getAccountTypeText()) ?>
+                </span>
+            </div>
+        </div>
+    </fieldset>
+<?php endif; ?>

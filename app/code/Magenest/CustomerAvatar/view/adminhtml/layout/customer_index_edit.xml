@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer_form">
+            <block class="Magenest\CustomerAvatar\Block\Adminhtml\Customer\Edit\Tab\Avatar" 
+                   name="customer.avatar.tab"
+                   template="Magenest_CustomerAvatar::customer/edit/tab/avatar.phtml">
+                <arguments>
+                    <argument name="tab_label" xsi:type="string" translate="true">Avatar</argument>
+                    <argument name="sort_order" xsi:type="number">1000</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

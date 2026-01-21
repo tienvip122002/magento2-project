@@ -65,7 +65,7 @@ class AddAvatarAttribute implements DataPatchInterface
             Customer::ENTITY,
             'avatar',
             [
-                'type' => 'varchar',
+                'type' => 'text',
                 'label' => 'Avatar',
                 'input' => 'image',
                 'required' => false,
@@ -74,7 +74,8 @@ class AddAvatarAttribute implements DataPatchInterface
                 'user_defined' => true,
                 'sort_order' => 100,
                 'position' => 100,
-                'system' => false
+                'system' => false,
+                'backend' => \Magenest\CustomerAvatar\Model\Customer\Attribute\Backend\Avatar::class,
             ]
         );
 

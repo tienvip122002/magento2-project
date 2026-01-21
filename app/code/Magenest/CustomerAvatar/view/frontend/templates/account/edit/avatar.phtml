@@ -1,0 +1,209 @@
+<?php
+/**
+ * @var \Magenest\CustomerAvatar\Block\Account\Dashboard\Avatar $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$uploadUrl = $block->getUrl('customeravatar/avatar/upload');
+$saveUrl = $block->getUrl('customeravatar/avatar/save');
+$avatarUrl = $block->getAvatarUrl();
+$hasAvatar = $block->hasAvatar();
+?>
+
+<div class="block block-customer-avatar-edit">
+    <div class="block-title">
+        <strong>
+            <?= $escaper->escapeHtml(__('My Avatar')) ?>
+        </strong>
+    </div>
+    <div class="block-content">
+        <form action="<?= $escaper->escapeUrl($saveUrl) ?>" method="post" id="avatar-form" class="form form-avatar">
+            <?= $block->getBlockHtml('formkey') ?>
+
+            <div class="field avatar">
+                <label class="label" for="avatar-upload">
+                    <span>
+                        <?= $escaper->escapeHtml(__('Avatar Image')) ?>
+                    </span>
+                </label>
+                <div class="control">
+                    <!-- Preview Area -->
+                    <div id="avatar-preview-container" style="margin-bottom: 15px; text-align: center;">
+                        <?php if ($hasAvatar): ?>
+                            <img id="avatar-preview" src="<?= $escaper->escapeUrl($avatarUrl) ?>"
+                                alt="<?= $escaper->escapeHtml(__('Current Avatar')) ?>"
+                                style="max-width: 150px; max-height: 150px; border-radius: 50%; border: 3px solid #f0f0f0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                        <?php else: ?>
+                            <div id="avatar-placeholder"
+                                style="width: 150px; height: 150px; border-radius: 50%; background: #f5f5f5; display: inline-flex; align-items: center; justify-content: center; border: 2px dashed #ccc;">
+                                <span style="font-size: 48px; color: #ccc;">&#128100;</span>
+                            </div>
+                            <img id="avatar-preview" src="" alt="<?= $escaper->escapeHtml(__('Preview')) ?>"
+                                style="max-width: 150px; max-height: 150px; border-radius: 50%; border: 3px solid #f0f0f0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none;" />
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- File Input -->
+                    <input type="file" id="avatar-upload" name="avatar_file" accept="image/jpeg,image/png,image/gif"
+                        style="margin-bottom: 10px;" />
+
+                    <!-- Hidden field to store the uploaded file path -->
+                    <input type="hidden" id="avatar-path" name="avatar"
+                        value="<?= $hasAvatar ? $escaper->escapeHtmlAttr($block->getAvatarPath()) : '' ?>" />
+
+                    <!-- Upload Status -->
+                    <div id="upload-status" style="margin-top: 10px;"></div>
+
+                    <p class="note" style="margin-top: 10px; color: #666; font-size: 12px;">
+                        <?= $escaper->escapeHtml(__('Allowed file types: JPG, JPEG, PNG, GIF. Max file size: 4MB.')) ?>
+                    </p>
+                </div>
+            </div>
+
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <button type="submit" class="action save primary"
+                        title="<?= $escaper->escapeHtmlAttr(__('Save Avatar')) ?>" id="save-avatar-btn">
+                        <span>
+                            <?= $escaper->escapeHtml(__('Save Avatar')) ?>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .block-customer-avatar-edit {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+    }
+
+    .block-customer-avatar-edit .block-title {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .block-customer-avatar-edit .block-title strong {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .block-customer-avatar-edit .field {
+        margin-bottom: 20px;
+    }
+
+    .block-customer-avatar-edit .label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    #avatar-upload {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    #upload-status.success {
+        color: #006400;
+        font-weight: bold;
+    }
+
+    #upload-status.error {
+        color: #dc0000;
+        font-weight: bold;
+    }
+
+    #upload-status.uploading {
+        color: #ff8c00;
+    }
+</style>
+
+<script>
+    require(['jquery'], function ($) {
+        'use strict';
+
+        var uploadUrl = '<?= $escaper->escapeJs($uploadUrl) ?>';
+
+        $('#avatar-upload').on('change', function (e) {
+            var file = this.files[0];
+            if (!file) return;
+
+            // Validate file type
+            var allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (allowedTypes.indexOf(file.type) === -1) {
+                $('#upload-status').removeClass('success uploading').addClass('error')
+                    .text('<?= $escaper->escapeJs(__('Invalid file type. Allowed: JPG, PNG, GIF')) ?>');
+                return;
+            }
+
+            // Validate file size (4MB)
+            if (file.size > 4194304) {
+                $('#upload-status').removeClass('success uploading').addClass('error')
+                    .text('<?= $escaper->escapeJs(__('File size exceeds 4MB limit.')) ?>');
+                return;
+            }
+
+            // Show uploading status
+            $('#upload-status').removeClass('success error').addClass('uploading')
+                .text('<?= $escaper->escapeJs(__('Uploading...')) ?>');
+
+            // Create FormData
+            var formData = new FormData();
+            formData.append('avatar', file);
+            formData.append('form_key', $('input[name="form_key"]').val());
+
+            // Upload file
+            $.ajax({
+                url: uploadUrl,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.error) {
+                        $('#upload-status').removeClass('success uploading').addClass('error')
+                            .text(response.error);
+                        return;
+                    }
+
+                    // Update preview
+                    if (response.url) {
+                        $('#avatar-placeholder').hide();
+                        $('#avatar-preview').attr('src', response.url).show();
+                    }
+
+                    // Store file path
+                    if (response.file) {
+                        $('#avatar-path').val(response.file);
+                    }
+
+                    $('#upload-status').removeClass('error uploading').addClass('success')
+                        .text('<?= $escaper->escapeJs(__('Upload successful! Click "Save Avatar" to save.')) ?>');
+                },
+                error: function (xhr, status, error) {
+                    $('#upload-status').removeClass('success uploading').addClass('error')
+                        .text('<?= $escaper->escapeJs(__('Upload failed. Please try again.')) ?>');
+        }
+        });
+    });
+
+    // Form validation before submit
+    $('#avatar-form').on('submit', function (e) {
+        var avatarPath = $('#avatar-path').val();
+        if (!avatarPath) {
+            e.preventDefault();
+            $('#upload-status').removeClass('success uploading').addClass('error')
+                .text('<?= $escaper->escapeJs(__('Please upload an avatar first.')) ?>');
+            return false;
+        }
+    });
+});
+</script>

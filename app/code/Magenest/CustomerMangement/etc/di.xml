@@ -15,4 +15,15 @@
         <plugin name="magenest_transfer_vn_region_to_customer_address" 
                 type="Magenest\CustomerMangement\Plugin\Quote\Address\ExportCustomerAddressPlugin" />
     </type>
+    
+    <type name="Magento\Quote\Api\BillingAddressManagementInterface">
+        <plugin name="magenest_save_vn_region_billing" 
+                type="Magenest\CustomerMangement\Plugin\BillingAddressManagementPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Customer\Block\Address\Edit">
+        <plugin name="magenest_override_address_edit_template"
+                type="Magenest\CustomerMangement\Plugin\Block\Customer\Address\EditPlugin" />
+    </type>
 </config>
