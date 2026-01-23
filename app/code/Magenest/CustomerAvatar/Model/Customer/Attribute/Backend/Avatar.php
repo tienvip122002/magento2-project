@@ -104,79 +104,154 @@ class Avatar extends AbstractBackend
     {
         $attributeCode = $this->getAttribute()->getAttributeCode();
 
-        // Lấy giá trị hiện tại đã được set vào object (từ setCustomAttribute hoặc setData)
+        // Lấy giá trị hiện tại đã được set vào object
         $objectValue = $object->getData($attributeCode);
 
-        // Lấy dữ liệu từ POST (do UI Component gửi lên) - chỉ cho admin
+        // Lấy dữ liệu từ POST
         $postData = $this->getRequest()->getPostValue();
-        $postValue = null;
 
-        if (isset($postData['customer'][$attributeCode])) {
+        // Xác định xem có phải đang Save Customer ở Admin không
+        $isCustomerPost = isset($postData['customer']) || isset($postData['customer_avatar']);
+
+        $postValue = null;
+        if (isset($postData['customer']) && array_key_exists($attributeCode, $postData['customer'])) {
             $postValue = $postData['customer'][$attributeCode];
-        } elseif (isset($postData['customer_avatar'][$attributeCode])) {
+        } elseif (isset($postData['customer_avatar']) && array_key_exists($attributeCode, $postData['customer_avatar'])) {
             $postValue = $postData['customer_avatar'][$attributeCode];
         }
 
         $finalValue = null;
+        $valueProcessed = false;
 
-        // Ưu tiên xử lý POST data từ admin UI (array format)
-        if (is_array($postValue) && !empty($postValue)) {
-            // Trường hợp 1: Xóa ảnh
-            if (!empty($postValue['delete']) || (isset($postValue[0]['file']) && $postValue[0]['file'] === '[deleted]')) {
+        // DEBUG: Ghi log để kiểm tra dữ liệu thực tế
+        if ($isCustomerPost) {
+            \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\Psr\Log\LoggerInterface::class)
+                ->info('Avatar Post Value Debug: ' . json_encode($postValue));
+        }
+
+        // 1. Xử lý trường hợp lưu từ Admin Form (UI Component)
+        if ($isCustomerPost) {
+            $valueProcessed = true;
+
+            // Case A: Xóa ảnh (Admin gửi lên null, mảng rỗng, hoặc flag delete)
+            if (
+                empty($postValue) || (is_array($postValue) && (
+                    !empty($postValue['delete']) ||
+                    (isset($postValue[0]['file']) && $postValue[0]['file'] === '[deleted]')
+                ))
+            ) {
                 $this->deleteOldImage($object, $attributeCode);
                 $finalValue = null;
             }
-            // Trường hợp 2: Upload ảnh mới từ admin
-            elseif (isset($postValue[0]['file']) && is_string($postValue[0]['file'])) {
+            // Case B: Upload mới hoặc giữ nguyên ảnh (UI gửi mảng chứa file info)
+            elseif (is_array($postValue) && isset($postValue[0]['file']) && is_string($postValue[0]['file'])) {
                 $file = $postValue[0]['file'];
-
                 // Chuẩn hóa đường dẫn
                 $file = ltrim($file, '/');
-
-                // Cắt bỏ "customer/" prefix nếu có (do Magento tự thêm khi save)
                 if (strpos($file, 'customer/') === 0) {
                     $file = substr($file, strlen('customer'));
                 } else {
                     $file = '/' . $file;
                 }
 
+                // Logic check xóa file cũ nếu là file mới
+                $oldValue = $object->getOrigData($attributeCode);
+                $isSameFile = false;
+
+                $oldPath = null;
+                if (is_array($oldValue) && isset($oldValue[0]['file'])) {
+                    $oldPath = $oldValue[0]['file'];
+                } elseif (is_array($oldValue) && isset($oldValue['file'])) {
+                    $oldPath = $oldValue['file'];
+                } elseif (is_string($oldValue)) {
+                    $oldPath = $oldValue;
+                }
+
+                if ($oldPath) {
+                    $cleanOldPath = ltrim($oldPath, '/');
+                    if (strpos($cleanOldPath, 'customer/') === 0) {
+                        $cleanOldPath = substr($cleanOldPath, strlen('customer'));
+                    } else {
+                        $cleanOldPath = '/' . $cleanOldPath;
+                    }
+                    if ($cleanOldPath === $file) {
+                        $isSameFile = true;
+                    }
+                }
+
+                if (!$isSameFile) {
+                    $this->deleteOldImage($object, $attributeCode);
+                }
+
                 $finalValue = $file;
             }
-            // Trường hợp 3: Không thay đổi gì (giữ nguyên ảnh cũ)
+            // Case C: Fallback an toàn, giữ nguyên giá trị cũ nếu format lạ
             else {
                 $finalValue = $object->getOrigData($attributeCode);
             }
         }
-        // Xử lý string value (từ frontend controller hoặc direct set)
-        elseif (is_string($objectValue) && !empty($objectValue)) {
-            $file = ltrim($objectValue, '/');
 
-            // Chuẩn hóa path cho database
-            if (strpos($file, 'customer/') === 0) {
-                $file = substr($file, strlen('customer'));
-            } else {
-                $file = '/' . $file;
-            }
-
-            $finalValue = $file;
-        }
-        // Xử lý array value được set trực tiếp vào object
-        elseif (is_array($objectValue) && !empty($objectValue)) {
-            if (isset($objectValue[0]['file']) && is_string($objectValue[0]['file'])) {
-                $file = ltrim($objectValue[0]['file'], '/');
-
+        // 2. Xử lý trường hợp lưu từ Code khác / Frontend (Không phải Admin Post Form)
+        if (!$valueProcessed) {
+            // Xử lý string value
+            if (is_string($objectValue) && !empty($objectValue)) {
+                $file = ltrim($objectValue, '/');
                 if (strpos($file, 'customer/') === 0) {
                     $file = substr($file, strlen('customer'));
                 } else {
                     $file = '/' . $file;
                 }
 
+                // Logic check xóa file cũ (tương tự)
+                $oldValue = $object->getOrigData($attributeCode);
+                $isSameFile = false;
+
+                $oldPath = null;
+                if (is_array($oldValue) && isset($oldValue[0]['file'])) {
+                    $oldPath = $oldValue[0]['file'];
+                } elseif (is_string($oldValue)) {
+                    $oldPath = $oldValue;
+                }
+
+                if ($oldPath) {
+                    $cleanOldPath = ltrim($oldPath, '/');
+                    if (strpos($cleanOldPath, 'customer/') === 0) {
+                        $cleanOldPath = substr($cleanOldPath, strlen('customer'));
+                    } else {
+                        $cleanOldPath = '/' . $cleanOldPath;
+                    }
+                    if ($cleanOldPath === $file) {
+                        $isSameFile = true;
+                    }
+                }
+
+                if (!$isSameFile) {
+                    $this->deleteOldImage($object, $attributeCode);
+                }
+
                 $finalValue = $file;
             }
-        }
-        // Nếu không có giá trị mới, giữ nguyên giá trị cũ
-        elseif ($objectValue === null && $postValue === null) {
-            $finalValue = $object->getOrigData($attributeCode);
+            // Xử lý array value
+            elseif (is_array($objectValue) && !empty($objectValue)) {
+                if (isset($objectValue[0]['file']) && is_string($objectValue[0]['file'])) {
+                    $file = ltrim($objectValue[0]['file'], '/');
+                    if (strpos($file, 'customer/') === 0) {
+                        $file = substr($file, strlen('customer'));
+                    } else {
+                        $file = '/' . $file;
+                    }
+
+                    // Đơn giản hóa: nếu set array mới, coi như file mới -> xóa cũ
+                    $this->deleteOldImage($object, $attributeCode);
+
+                    $finalValue = $file;
+                }
+            }
+            // Mặc định giữ nguyên nếu không có thay đổi và không phải case xóa
+            else {
+                $finalValue = $object->getOrigData($attributeCode);
+            }
         }
 
         // Set giá trị chuẩn vào model để lưu xuống DB
@@ -191,17 +266,51 @@ class Avatar extends AbstractBackend
     private function deleteOldImage($object, $attributeCode)
     {
         $oldValue = $object->getOrigData($attributeCode);
+        $path = null;
 
-        if ($oldValue && is_string($oldValue)) {
+        if ($oldValue) {
+            if (is_string($oldValue)) {
+                $path = $oldValue;
+            } elseif (is_array($oldValue)) {
+                // Xử lý trường hợp dữ liệu load lên là array (do afterLoad)
+                if (isset($oldValue[0]['file']) && is_string($oldValue[0]['file'])) {
+                    $path = $oldValue[0]['file'];
+                } elseif (isset($oldValue['file']) && is_string($oldValue['file'])) {
+                    $path = $oldValue['file'];
+                }
+            }
+        }
+
+        if ($path) {
             $mediaDir = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
-            $path = ltrim($oldValue, '/'); // Normalize path
+
+            // Chuẩn hóa path: Bỏ 'customer/' nếu có vì DB lưu short path, nhưng array UI lại full path
+            // Tuy nhiên, logic check file delete cần cẩn thận.
+            // Nếu path bắt đầu bằng 'customer/', ta cần check xem file thực tế nằm đâu.
+
+            // Cách an toàn: Check cả 2 đường dẫn
+            $pathsToCheck = [];
+            $cleanPath = ltrim($path, '/');
+
+            $pathsToCheck[] = $cleanPath; // Path gốc
+
+            if (strpos($cleanPath, 'customer/') === 0) {
+                $pathsToCheck[] = substr($cleanPath, strlen('customer/')); // Path cắt customer
+            }
 
             try {
-                if ($mediaDir->isExist($path)) {
-                    $mediaDir->delete($path);
+                foreach ($pathsToCheck as $p) {
+                    if ($mediaDir->isExist($p)) {
+                        $mediaDir->delete($p);
+                        // Chỉ xóa 1 lần là đủ
+                        break;
+                    }
                 }
             } catch (\Exception $e) {
                 // Log if needed
+                \Magento\Framework\App\ObjectManager::getInstance()
+                    ->get(\Psr\Log\LoggerInterface::class)
+                    ->critical('Error deleting avatar: ' . $e->getMessage());
             }
         }
     }
