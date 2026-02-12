@@ -77,7 +77,6 @@ class Csv extends Action
             'ID Order',
             'Purchase Point',
             'Purchase Date',
-            'Brand',
             'Ref Code',
             'Product Name',
             'Product Qty',
@@ -110,51 +109,15 @@ class Csv extends Action
             $items = $order->getAllVisibleItems();
 
             foreach ($items as $item) {
-                $brand = 'N/A';
-
-                // Try to get brand from product
-            try {
-                $productId = (int)$item->getProductId();
-                if ($productId) {   
-                    $product = $this->productRepository->getById($productId);
-
-                    $attr = $product->getResource()->getAttribute('brand'); // có thể false
-                    $rawValue = $product->getData('brand');
-
-                    if ($attr && $rawValue !== null && $rawValue !== '') {
-                        // nếu là dropdown/multiselect thì có source
-                        if (method_exists($attr, 'usesSource') && $attr->usesSource()) {
-                            $text = $attr->getSource()->getOptionText($rawValue);
-                            if (is_array($text)) {
-                                $text = implode(', ', $text);
-                            }
-                            if ($text) {
-                                $brand = (string)$text;
-                            } else {
-                                $brand = (string)$rawValue;
-                            }
-                        } else {
-                            // attribute kiểu text
-                            $brand = (string)$rawValue;
-                        }
-                    }
-                }
-            } catch (\Throwable $e) {
-                $this->logger->warning(
-                    'Cannot resolve brand for product ' . $item->getProductId() . ': ' . $e->getMessage()
-                );
-            }
-
                 $rowData = [
                     $order->getIncrementId(),
                     $order->getStoreName(),
                     date('M:M d, Y', strtotime($order->getCreatedAt())),
-                    $brand,
                     $item->getSku(),
                     $item->getName(),
                     (int) $item->getQtyOrdered(),
-                    number_format((float)$item->getPrice(), 0, '', ''),
-                    number_format((float)$item->getRowTotal(), 0, '', '') . '₫'
+                    number_format((float) $item->getPrice(), 0, '', ''),
+                    number_format((float) $item->getRowTotal(), 0, '', '') . '₫'
 
                 ];
 

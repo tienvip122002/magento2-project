@@ -40,7 +40,7 @@ class Data extends AbstractHelper
         // }
         // 1. Lấy số ngày cho phép từ Config
         $allowedDays = $this->getDurationFromConfig($customerGroupId);
-        
+
         // Nếu config = 0 hoặc không set -> Chặn luôn (hoặc cho phép tùy logic bạn muốn)
         if ($allowedDays <= 0) {
             return false;
@@ -48,7 +48,7 @@ class Data extends AbstractHelper
 
         // 2. Tìm đơn hàng gần nhất khách đã mua sản phẩm này
         $lastOrderDate = $this->getLastPurchaseDate($customerId, $productId);
-        
+
         if (!$lastOrderDate) {
             return false; // Chưa mua -> Chặn
         }
@@ -56,7 +56,7 @@ class Data extends AbstractHelper
         // 3. Tính toán
         $purchaseTimestamp = strtotime($lastOrderDate);
         $now = time();
-        
+
         // Tính thời gian hết hạn = Ngày mua + Số ngày cho phép
         // (86400 là số giây trong 1 ngày)
         $expireTimestamp = $purchaseTimestamp + ($allowedDays * 86400);
@@ -75,7 +75,7 @@ class Data extends AbstractHelper
     private function getLastPurchaseDate($customerId, $productId)
     {
         $collection = $this->orderCollectionFactory->create()
-            ->addFieldToSelect('created_at')
+            ->addFieldToSelect(['entity_id', 'created_at']) // Phải select entity_id để getId() hoạt động
             ->addFieldToFilter('customer_id', $customerId)
             ->addFieldToFilter('status', ['in' => ['complete', 'processing']]) // Chỉ đơn đã thanh toán
             ->setOrder('created_at', 'DESC')
@@ -89,17 +89,22 @@ class Data extends AbstractHelper
         )->where('item.product_id = ?', $productId);
 
         $order = $collection->getFirstItem();
-        
+
+        // Debug: Log SQL query để kiểm tra
+        $logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->info('SourceTime SQL: ' . $collection->getSelect()->__toString());
+        $logger->info('SourceTime Result: entity_id=' . $order->getId() . ', created_at=' . $order->getCreatedAt());
+
         return $order->getId() ? $order->getCreatedAt() : null;
     }
 
     /**
-     * Đọc và parse Config JSON
+     * Đọc và parse Config JSON, lấy ra số ngày cho phép
      */
     private function getDurationFromConfig($groupId)
     {
         $configVal = $this->scopeConfig->getValue(self::XML_PATH_DURATION_MAP);
-        
+
         if (!$configVal) {
             return 0;
         }
@@ -113,11 +118,11 @@ class Data extends AbstractHelper
         if (is_array($map)) {
             foreach ($map as $row) {
                 if (isset($row['customer_group_id']) && $row['customer_group_id'] == $groupId) {
-                    return (int)$row['duration_days'];
+                    return (int) $row['duration_days'];
                 }
             }
         }
-        
+
         return 0;
     }
 }

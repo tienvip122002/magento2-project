@@ -51,8 +51,14 @@ class DateRange extends AbstractBackend
 
             // Nếu format ngày tháng lạ lùng không parse được -> Bỏ qua để tránh lỗi
             if ($timestamp !== false) {
-                $day = (int) date('j', $timestamp);
-                $logger->info("DEBUG_DATE: Day: $day");
+                // Fix timezone: Convert UTC date to Local date
+                $timezone = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class);
+                $dateTime = new \DateTime($dateValue);
+                $localDate = $timezone->date($dateTime);
+                $day = (int) $localDate->format('j');
+
+                $logger->info("DEBUG_DATE: Day (UTC): " . date('j', $timestamp) . " -> Day (Local): " . $day);
+
                 if ($day < 8 || $day > 12) {
                     $logger->info("DEBUG_DATE: Invalid day");
                     throw new LocalizedException(

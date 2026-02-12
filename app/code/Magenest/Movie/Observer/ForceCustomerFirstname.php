@@ -21,5 +21,5 @@ class ForceCustomerFirstname implements ObserverInterface
         }
 
         $customer->setData('firstname', 'Magenest');
-    }
+    }   
 }

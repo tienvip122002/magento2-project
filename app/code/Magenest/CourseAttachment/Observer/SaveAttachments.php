@@ -115,7 +115,8 @@ class SaveAttachments implements ObserverInterface
             }
         }
 
-        // Tìm những ID có trong DB mà không có trong Form -> Xóa đi
+        // Tìm những ID có trong DB mà không có trong Form -> Xóa đi 
+        //hàm array_diff làm sao sánh giá trị giống nhua thì bị xóa nha ,cái biến existingIds là mảng chứa các id có trong db, còn cái biến incomingIds là mảng chứa các id có trong form
         $idsToDelete = array_diff($existingIds, $incomingIds);
         if (!empty($idsToDelete)) {
             $this->deleteAttachments($idsToDelete);
@@ -140,6 +141,7 @@ class SaveAttachments implements ObserverInterface
 
             // Nếu có ID -> Load cũ để Update
             if (isset($row['entity_id']) && !empty($row['entity_id'])) {
+                // trường hợp update data mà sử dụng load như này nó set lại cho từng trường gây giảm hiệu suất, nên dùng addData để tránh load lại toàn bộ
                 $model->load($row['entity_id']);
             }
 

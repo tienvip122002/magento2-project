@@ -46,7 +46,6 @@ define([
             }
 
             console.log('Parsed customer group contents:', customerGroupContents);
-
             // 3. Xác định nội dung dựa trên customer group ID
             // Delay để đợi customer data load xong
             setTimeout(function () {

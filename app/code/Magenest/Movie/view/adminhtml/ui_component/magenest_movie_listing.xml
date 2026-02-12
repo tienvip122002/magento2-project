@@ -100,13 +100,5 @@
                 <label translate="true">Actions</label>
             </settings>
         </actionsColumn>
-        
-        <!-- Actions Column (Edit/Delete) -->
-        <!-- <actionsColumn name="actions" class="Magento\Ui\Component\Listing\Columns\Actions" sortOrder="200">
-           <settings>
-               <indexField>movie_id</indexField>
-               <label translate="true">Actions</label>
-           </settings>
-       </actionsColumn> -->
     </columns>
 </listing>

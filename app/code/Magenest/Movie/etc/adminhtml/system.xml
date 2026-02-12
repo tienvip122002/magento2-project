@@ -50,7 +50,6 @@
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Rows in table "magenest_movie"</label>
                     <frontend_model>Magenest\Movie\Block\Adminhtml\System\Config\Form\Field\RowCount</frontend_model>
-                    <comment><![CDATA[read-only]]></comment>
                     <comment><![CDATA[<!--table:magenest_movie-->read-only]]></comment>
                 </field>
 
@@ -65,8 +64,7 @@
                         <field id="source_model_test">1</field>
                     </depends>
 
-                    <comment><![CDATA[read-only, only visible when Custom Select Field = show]]></comment>
-                    <comment><![CDATA[<!--table:magenest_actor-->read-only, only visible when ...]]></comment>
+                    <comment><![CDATA[<!--table:magenest_actor-->read-only, only visible when Custom Select Field = show]]></comment>
 
                 </field>
 

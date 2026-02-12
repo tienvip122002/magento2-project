@@ -21,7 +21,7 @@ class ColorData implements ArgumentInterface
 
     public function getColorOptions()
     {
-        // Lấy chuỗi JSON từ database - FIX: Đổi từ 'magenest_color' sang 'magenest'
+        // Lấy chuỗi JSON từ database 
         $configValue = $this->scopeConfig->getValue(
             'magenest/general/colors',
             ScopeInterface::SCOPE_STORE

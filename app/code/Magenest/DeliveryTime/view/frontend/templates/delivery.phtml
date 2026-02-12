@@ -2,6 +2,12 @@
     <!-- ko template: getTemplate() --><!-- /ko -->
 </div>
 
+<?php
+/** @var $block \Magento\Framework\View\Element\Template */
+/** @var $viewModel \Magenest\DeliveryTime\ViewModel\DeliveryTimeConfig */
+$viewModel = $block->getData('view_model');
+$optionId = $viewModel ? $viewModel->getDeliveryTimeOptionId() : 2;
+?>
 
 <script type="text/x-magento-init">
 {
@@ -9,7 +15,8 @@
         "Magento_Ui/js/core/app": {
             "components": {
                 "deliveryTimeComponent": {
-                    "component": "Magenest_DeliveryTime/js/delivery-time"
+                    "component": "Magenest_DeliveryTime/js/delivery-time",
+                    "optionId": "<?= $optionId ?>"
                 }
             }
         }
@@ -17,9 +24,12 @@
 }
 </script>
 <style>
-    /* Magenest Delivery Time Styles - Inline CSS for immediate loading */
+    /* ========================================
+       CSS Styles cho Magenest Delivery Time
+       Inline CSS để load ngay lập tức
+       ======================================== */
 
-    /* Container Wrapper */
+    /* ====== Container Wrapper - Khung bao ngoài ====== */
     #magenest-delivery-time-wrapper {
         display: block !important;
         visibility: visible !important;
@@ -29,7 +39,7 @@
         z-index: 10;
     }
 
-    /* Delivery Options Container */
+    /* ====== Khung chứa các tùy chọn giao hàng ====== */
     .magenest-delivery-options {
         display: block !important;
         visibility: visible !important;
@@ -41,7 +51,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
-    /* Title */
+    /* ====== Tiêu đề ====== */
     .magenest-delivery-options strong {
         display: block;
         margin-bottom: 15px;
@@ -50,7 +60,7 @@
         color: #333;
     }
 
-    /* Radio Fields */
+    /* ====== Radio Button Fields ====== */
     .magenest-delivery-options .field.choice {
         display: flex;
         align-items: center;
@@ -60,11 +70,12 @@
         transition: background-color 0.2s ease;
     }
 
+    /* Hiệu ứng hover cho radio option */
     .magenest-delivery-options .field.choice:hover {
         background-color: #f9f9f9;
     }
 
-    /* Radio Input */
+    /* ====== Nút Radio Input ====== */
     .magenest-delivery-options input[type="radio"] {
         display: inline-block !important;
         visibility: visible !important;
@@ -76,7 +87,7 @@
         position: relative;
     }
 
-    /* Radio Label */
+    /* ====== Label của Radio Button ====== */
     .magenest-delivery-options .field.choice label {
         display: inline-block !important;
         visibility: visible !important;
@@ -91,7 +102,7 @@
         display: inline-block;
     }
 
-    /* Date Input Field */
+    /* ====== Ô nhập ngày (Date Input Field) ====== */
     .magenest-delivery-options .control {
         display: block !important;
         visibility: visible !important;
@@ -112,28 +123,30 @@
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
+    /* Hiệu ứng focus cho ô input */
     .magenest-delivery-options .control input[type="text"]:focus {
         outline: none;
         border-color: #1979c3;
         box-shadow: 0 0 0 3px rgba(25, 121, 195, 0.1);
     }
 
+    /* Placeholder text */
     .magenest-delivery-options .control input[type="text"]::placeholder {
         color: #999;
         font-style: italic;
     }
 
-    /* Datepicker Icon Support */
+    /* ====== Hỗ trợ icon cho Datepicker ====== */
     .magenest-delivery-options .control {
         position: relative;
     }
 
-    /* Hide original Magento field if it exists */
+    /* Ẩn field date gốc của Magento (nếu tồn tại) */
     .field.date .control {
         display: none !important;
     }
 
-    /* Responsive */
+    /* ====== Responsive - Tương thích mobile ====== */
     @media (max-width: 768px) {
         .magenest-delivery-options {
             padding: 15px;
@@ -144,7 +157,7 @@
         }
     }
 
-    /* UI-datepicker custom styling */
+    /* ====== Style cho jQuery UI Datepicker ====== */
     .ui-datepicker {
         z-index: 9999 !important;
         background: #fff;
@@ -153,17 +166,20 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
+    /* Header của datepicker (tháng/năm) */
     .ui-datepicker-header {
         background: #1979c3;
         color: #fff;
         border-radius: 4px 4px 0 0;
     }
 
+    /* Các ô ngày trong lịch */
     .ui-datepicker-calendar td a {
         text-align: center;
         padding: 6px;
     }
 
+    /* Hiệu ứng hover cho ngày */
     .ui-datepicker-calendar td a:hover {
         background: #1979c3;
         color: #fff;
