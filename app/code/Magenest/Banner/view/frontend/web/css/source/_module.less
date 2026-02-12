@@ -1,32 +1,56 @@
+/* Container chung */
+.magenest-banner-container {
+    position: static;
+}
+
 .magenest-banner-item {
-    position: fixed;
-    top: 30%;
-    /* Cách đỉnh 30% */
-    z-index: 9999;
-    width: 150px;
-    /* Chiều rộng banner */
+    /* 1. Trôi theo trang (không đứng im 1 chỗ) */
+    position: absolute; 
+    
+    /* 2. Canh chiều cao: Tăng lên tầm 260px để né hẳn cái Header và Menu ra */
+    /* Bạn có thể tăng giảm số này để nó ngang hàng với banner Yoga */
+    top: 260px; 
+    
+    /* 3. Kích thước vừa phải thôi, 280px hơi to với laptop, để 180px là đẹp */
+    width: 180px; 
+    height: auto;
+    
+    z-index: 10;
     transition: all 0.3s;
 }
 
 .magenest-banner-item img {
     width: 100%;
-    height: auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* --- LOGIC CĂN CHỈNH TỪ TÂM (QUAN TRỌNG) --- */
+/* Giả sử web rộng 1280px -> Một nửa là 640px */
+
+/* BANNER TRÁI */
 .banner-left {
-    left: 0;
-    right: auto;
+    /* Đặt mốc ở giữa màn hình */
+    left: 50%; 
+    /* Kéo lùi về bên trái: 640px (nửa web) + 10px (khoảng hở) + 180px (chiều rộng banner) */
+    margin-left: -830px; 
 }
 
+/* BANNER PHẢI */
 .banner-right {
-    right: 0;
-    left: auto;
+    /* Đặt mốc ở giữa màn hình */
+    left: 50%;
+    /* Đẩy sang bên phải: 640px (nửa web) + 10px (khoảng hở) */
+    margin-left: 650px; 
 }
 
-/* Ẩn khi màn hình nhỏ (Mobile) */
-@media (max-width: 768px) {
+
+/* --- RESPONSIVE (Cực quan trọng) --- */
+/* Nếu màn hình nhỏ hơn 1700px (Laptop thường) thì phải ẩn đi */
+/* Vì: 1280 (web) + 180 (trái) + 180 (phải) = 1640px rồi */
+@media (max-width: 1700px) {
     .magenest-banner-item {
-        display: none;
+        display: none; /* Ẩn đi để không bị đè như hình cũ */
+        /* Hoặc nếu muốn hiện thì phải thu nhỏ lại cực bé */
     }
 }

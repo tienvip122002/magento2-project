@@ -36,7 +36,7 @@ class ConfigPingPong implements ObserverInterface
 
         if ((string)$value === 'Ping') {
             $post['groups'][$groupId]['fields'][$fieldId]['value'] = 'Pong';
-            $request->setPostValue($post); // ✅ ghi đè request để Magento save "Pong"
+            $request->setPostValue($post); //  ghi đè request để Magento save "Pong"
         }
     }
 }

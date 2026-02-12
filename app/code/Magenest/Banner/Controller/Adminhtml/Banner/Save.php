@@ -41,7 +41,6 @@ class Save extends Action
                         // Move file từ Tmp sang Chính thức
                         $this->imageUploader->moveFileFromTmp($imageName);
                     } catch (\Exception $e) {
-                        // Giờ dòng này sẽ chạy ngon lành vì đã có $this->logger
                         $this->logger->critical('Image move error: ' . $e->getMessage());
                     }
                 } else {

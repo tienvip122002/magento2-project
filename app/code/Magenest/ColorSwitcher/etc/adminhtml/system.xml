@@ -13,6 +13,24 @@
                     <frontend_model>Magenest\ColorSwitcher\Block\Adminhtml\Form\Field\Colors</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                 </field>
+
+                <!-- Nested group bên trong general -->
+                <group id="type_color" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Type Color Settings</label>
+                    
+                    <!-- Path sẽ là: magenest/general/type_color/enable -->
+                    <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Type Color</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>Path trong DB: magenest/general/type_color/enable</comment>
+                    </field>
+
+                    <!-- Path sẽ là: magenest/general/type_color/default_type -->
+                    <field id="default_type" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default Type</label>
+                        <comment>Path trong DB: magenest/general/type_color/default_type</comment>
+                    </field>
+                </group>
             </group>
         </section>
     </system>

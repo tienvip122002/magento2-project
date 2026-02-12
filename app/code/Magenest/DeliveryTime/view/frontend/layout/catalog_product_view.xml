@@ -5,7 +5,11 @@
             <block class="Magento\Framework\View\Element\Template" 
                    name="magenest.delivery.time" 
                    template="Magenest_DeliveryTime::delivery.phtml" 
-                   after="product.info.extrahint"/>
+                   after="product.info.extrahint">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Magenest\DeliveryTime\ViewModel\DeliveryTimeConfig</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

@@ -40,7 +40,7 @@ class RowCount extends Field
             }
             $comment = implode(' ', $parts);
         } else {
-            $comment = (string)$rawComment;
+            $comment = (string) $rawComment;
         }
 
         $table = '';
@@ -52,13 +52,14 @@ class RowCount extends Field
         if ($table !== '') {
             $conn = $this->resource->getConnection();
             $tableName = $this->resource->getTableName($table);
-            $count = (int)$conn->fetchOne("SELECT COUNT(*) FROM {$tableName}");
+            $count = (int) $conn->fetchOne("SELECT COUNT(*) FROM {$tableName}");
         }
 
         // Set value + make it readonly/disabled so it won't be saved/edited
-        $element->setValue((string)$count);
-        $element->setReadonly(true, true);
-        $element->setDisabled('disabled');
+        $element->setValue((string) $count);
+        // Set readonly attribute properly - needs to be string 'readonly' for HTML attribute
+        $element->setData('readonly', 'readonly');
+        $element->setDisabled(true);
 
         return $element->getElementHtml();
     }

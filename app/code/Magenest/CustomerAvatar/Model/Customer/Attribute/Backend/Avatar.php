@@ -175,6 +175,7 @@ class Avatar extends AbstractBackend
                     } else {
                         $cleanOldPath = '/' . $cleanOldPath;
                     }
+                    //nếu thêm ảnh mới đè ảnh cũ thì cờ isSameFile=false để xóa ảnh cũ
                     if ($cleanOldPath === $file) {
                         $isSameFile = true;
                     }

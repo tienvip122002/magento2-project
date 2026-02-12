@@ -56,7 +56,8 @@
             <settings>
                 <label translate="true">Banner Image</label>
                 <sortable>false</sortable>
-                <hasPreview>1</hasPreview> </settings>
+                <hasPreview>1</hasPreview> 
+            </settings>
         </column>
 
         <column name="status" component="Magento_Ui/js/grid/columns/select">
